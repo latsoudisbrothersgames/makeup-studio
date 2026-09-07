@@ -34,6 +34,7 @@ const TOUCH_LIFT = 56;
 export function useDragCosmetic(opts: Options) {
   const [ghost, setGhost] = useState<DragGhostState | null>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const ghostTimer = useRef<number | null>(null);
   const optsRef = useRef(opts);
   optsRef.current = opts;
   const active = useRef<{
@@ -63,22 +64,30 @@ export function useDragCosmetic(opts: Options) {
     a.el.removeEventListener('pointermove', onMove);
     a.el.removeEventListener('pointerup', onUp);
     a.el.removeEventListener('pointercancel', onCancel);
+    a.el.removeEventListener('lostpointercapture', onLost);
+    window.removeEventListener('pointerup', onWindowUp, true);
     try { a.el.releasePointerCapture(a.pointerId); } catch { /* ήδη ελεύθερο */ }
     document.body.classList.remove('is-dragging');
     const o = optsRef.current;
     const res = a.lastRes;
-    if (!cancelled && a.moved && res && res.ok && clientX !== undefined && clientY !== undefined) {
-      const target = o.stageRef.current?.faceToClient(res.anchor);
-      const g = ghostRef.current;
-      if (g && target) {
-        g.style.transition = 'transform 140ms ease-out, opacity 140ms ease-out';
-        g.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) translate(-50%, -50%) scale(0.4)`;
-        g.style.opacity = '0';
+    if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
+    try {
+      if (!cancelled && a.moved && res && res.ok && clientX !== undefined && clientY !== undefined) {
+        const target = o.stageRef.current?.faceToClient(res.anchor);
+        const g = ghostRef.current;
+        if (g && target) {
+          g.style.transition = 'transform 140ms ease-out, opacity 140ms ease-out';
+          g.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) translate(-50%, -50%) scale(0.4)`;
+          g.style.opacity = '0';
+        }
+        ghostTimer.current = window.setTimeout(() => { ghostTimer.current = null; setGhost(null); }, 150);
+        o.onDrop(a.payload, res, a.lastFacePt);
+      } else {
+        if (a.moved) playSound('boing');
+        setGhost(null);
       }
-      o.onDrop(a.payload, res, a.lastFacePt);
-      window.setTimeout(() => setGhost(null), 150);
-    } else {
-      if (a.moved) playSound('boing');
+    } catch (err) {
+      console.error('drop failed', err);
       setGhost(null);
     }
     o.onEnd();
@@ -121,6 +130,20 @@ export function useDragCosmetic(opts: Options) {
     finish(true);
   }, [finish]);
 
+  // Αν ο browser πάρει τον δείκτη (native drag, scroll, αλλαγή παραθύρου) → ακύρωση, ποτέ «κολλημένο» σύρσιμο.
+  const onLost = useCallback((e: PointerEvent) => {
+    const a = active.current;
+    if (!a || e.pointerId !== a.pointerId) return;
+    finish(true);
+  }, [finish]);
+
+  // Δίχτυ ασφαλείας: pointerup που δεν έφτασε στο στοιχείο (capture χάθηκε σιωπηλά).
+  const onWindowUp = useCallback((e: PointerEvent) => {
+    const a = active.current;
+    if (!a || e.pointerId !== a.pointerId) return;
+    finish(false, e.clientX, e.clientY);
+  }, [finish]);
+
   const startDrag = useCallback((e: React.PointerEvent, payload: DragPayload) => {
     if (active.current || !optsRef.current.enabledRef.current) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -134,7 +157,10 @@ export function useDragCosmetic(opts: Options) {
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onCancel);
+    el.addEventListener('lostpointercapture', onLost);
+    window.addEventListener('pointerup', onWindowUp, true);
     document.body.classList.add('is-dragging');
+    if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
     setGhost({ ...payload, pointerType: e.pointerType });
     const o = optsRef.current;
     o.onHover(payload, candidateRegions(o.face, o.exprRef.current, payload.cosmetic), null);
@@ -146,7 +172,7 @@ export function useDragCosmetic(opts: Options) {
       }
       moveGhost(e.clientX, e.clientY, e.pointerType);
     });
-  }, [onMove, onUp, onCancel]);
+  }, [onMove, onUp, onCancel, onLost, onWindowUp]);
 
   // Escape / απώλεια εστίασης παραθύρου → ακύρωση
   useEffect(() => {

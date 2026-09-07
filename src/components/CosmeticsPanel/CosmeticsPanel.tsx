@@ -50,7 +50,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
   const payload = (color: string, variant?: string): DragPayload => ({ cosmetic, color, variant });
 
   return (
-    <aside className="panel" aria-label="Καλλυντικά">
+    <aside className="panel" aria-label="Καλλυντικά" onDragStart={(e) => e.preventDefault()}>
       <nav className="panel__groups" aria-label="Ομάδες">
         {GROUPS.map((g) => (
           <button
@@ -92,7 +92,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
                 onStartDrag(e, { cosmetic: c, color: s.color, variant: s.variant });
               }}
             >
-              {url ? <img className="panel__cat-img pixelated" src={url} alt="" /> : <span className="panel__cat-emoji" aria-hidden="true">{c.emoji}</span>}
+              {url ? <img className="panel__cat-img pixelated" src={url} alt="" draggable={false} /> : <span className="panel__cat-emoji" aria-hidden="true">{c.emoji}</span>}
               <span className="panel__cat-label">{c.labelEl}</span>
             </button>
           );
@@ -121,7 +121,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
                   aria-label={VARIANT_LABELS[v] ?? v}
                   title={VARIANT_LABELS[v] ?? v}
                 >
-                  {st ? <img src={st} alt="" className="pixelated" /> : <span className="swatch__glyph" style={{ color: isStickers ? sel.color : undefined }}>{variantGlyph(v)}</span>}
+                  {st ? <img src={st} alt="" className="pixelated" draggable={false} /> : <span className="swatch__glyph" style={{ color: isStickers ? sel.color : undefined }}>{variantGlyph(v)}</span>}
                 </button>
               );
             })}

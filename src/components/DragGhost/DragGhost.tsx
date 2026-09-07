@@ -16,7 +16,7 @@ export function DragGhost({ ghost, ref }: Props) {
   return createPortal(
     <div ref={ref} className="drag-ghost" aria-hidden="true">
       <span className="drag-ghost__blob" style={{ background: ghost.color || '#fff' }} />
-      {url ? <img className="drag-ghost__img pixelated" src={url} alt="" /> : <span className="drag-ghost__emoji">{ghost.cosmetic.emoji}</span>}
+      {url ? <img className="drag-ghost__img pixelated" src={url} alt="" draggable={false} /> : <span className="drag-ghost__emoji">{ghost.cosmetic.emoji}</span>}
     </div>,
     document.body,
   );

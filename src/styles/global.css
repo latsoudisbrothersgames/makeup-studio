@@ -102,6 +102,13 @@ svg,
 canvas {
   display: block;
   max-width: 100%;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Εικόνες μέσα σε κουμπιά δεν πρέπει να «πιάνουν» τον δείκτη ούτε να ξεκινούν native drag */
+button img {
+  pointer-events: none;
 }
 
 h1,
