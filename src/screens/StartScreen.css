@@ -12,8 +12,11 @@
 }
 
 .start__art {
-  width: min(70vw, 520px);
+  width: min(92vw, 820px, 100vh);
   height: auto;
+  border-radius: var(--radius-lg);
+  border: 6px solid #fff;
+  box-shadow: var(--shadow-lg);
 }
 
 .start__emoji {

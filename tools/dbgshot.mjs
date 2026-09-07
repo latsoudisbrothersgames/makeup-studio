@@ -1,0 +1,11 @@
+import { chromium } from 'playwright-core';
+const b = await chromium.launch({ channel: 'chrome', headless: true });
+const p = await b.newPage({ viewport: { width: 1600, height: 1100 } });
+await p.goto('http://localhost:5174/?test=1#/studio?face=f1&new=1&debug=1');
+await p.waitForSelector('[data-face-ready="1"]', { timeout: 20000 });
+await p.waitForFunction(() => window.__studio?.ready === true);
+await p.evaluate(() => window.__studio.freeze(true));
+await p.waitForTimeout(300);
+const el = await p.$('.face-stage__frame');
+await el.screenshot({ path: 'tools/shots/debug-f1.png' });
+await b.close(); console.log('ok');
