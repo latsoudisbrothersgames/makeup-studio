@@ -1,0 +1,152 @@
+/* ─── Tokens ─────────────────────────────────────────────────────── */
+:root {
+  --pink-50: #fff5f9;
+  --pink-100: #ffe1ee;
+  --pink-200: #ffc2da;
+  --pink-400: #ff7fb0;
+  --pink-500: #ff5c9a;
+  --pink-600: #e6417f;
+  --lilac-100: #efe6ff;
+  --lilac-300: #cbb5ff;
+  --lilac-500: #9b7bea;
+  --lilac-700: #6d4fc4;
+  --mint-500: #3ec6a0;
+  --mint-600: #2aa585;
+  --sun-500: #ffc53d;
+  --sun-600: #f5a800;
+  --coral-500: #ff6b6b;
+  --coral-600: #e04f4f;
+  --plum-900: #3b2140;
+  --plum-700: #5a3a5e;
+  --plum-500: #8a6a8e;
+  --surface: #ffffff;
+  --surface-alt: #fff8fb;
+  --text-900: #3b2140;
+  --text-600: #6b4f70;
+  --text-400: #9c86a0;
+
+  --font-main: 'Comfortaa', 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fs-sm: clamp(0.95rem, 0.8rem + 0.5vw, 1.15rem);
+  --fs-md: clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem);
+  --fs-lg: clamp(1.3rem, 1rem + 1vw, 1.8rem);
+  --fs-xl: clamp(1.7rem, 1.2rem + 1.6vw, 2.6rem);
+  --fs-2xl: clamp(2.2rem, 1.4rem + 2.6vw, 3.8rem);
+
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 2px 8px rgba(59, 33, 64, 0.1);
+  --shadow-md: 0 8px 22px rgba(59, 33, 64, 0.14);
+  --shadow-lg: 0 16px 44px rgba(59, 33, 64, 0.2);
+  --transition-fast: 140ms ease;
+  --tap: 56px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+/* ─── Επαναφορά ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  font-size: var(--fs-md);
+  line-height: 1.4;
+  color: var(--text-900);
+  background: linear-gradient(160deg, #fff0f6 0%, #f3e9ff 55%, #e6f7ff 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.15;
+  color: var(--plum-900);
+  font-weight: 700;
+}
+
+:focus-visible {
+  outline: 4px solid var(--sun-500);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Εικόνες pixel art χωρίς εξομάλυνση */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Όσο σέρνουμε καλλυντικό: κανένα scroll, κανένα callout */
+body.is-dragging {
+  cursor: grabbing;
+}
+body.is-dragging * {
+  cursor: grabbing !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

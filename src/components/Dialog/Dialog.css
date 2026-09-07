@@ -1,0 +1,82 @@
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(59, 33, 64, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-b));
+  animation: dialog-in 160ms ease-out;
+}
+
+.dialog {
+  width: min(560px, 100%);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 6px solid var(--pink-200);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dialog__title {
+  font-size: var(--fs-xl);
+  text-align: center;
+}
+
+.dialog__body {
+  font-size: var(--fs-md);
+  color: var(--text-600);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dialog__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dialog__actions .btn {
+  flex: 1 1 180px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.field__label {
+  font-weight: 700;
+  color: var(--plum-700);
+  font-size: var(--fs-sm);
+}
+
+.field__input {
+  min-height: var(--tap);
+  border-radius: var(--radius-md);
+  border: 3px solid var(--pink-200);
+  padding: 8px 14px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--plum-900);
+  background: var(--surface-alt);
+}
+
+.field__input:focus {
+  border-color: var(--pink-500);
+  outline: none;
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}

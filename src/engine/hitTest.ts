@@ -1,0 +1,66 @@
+import type { Cosmetic } from '../types/cosmetic';
+import type { Expression, Face, Pt, RegionId } from '../types/face';
+import { centroid, distToPolyline, MIRROR, pointInPolygon, polyBBox } from './geometry';
+import { getRegion } from './regions';
+
+export type DropResolution =
+  | { ok: true; regionIds: RegionId[]; anchor: Pt }
+  | { ok: false };
+
+function hitsRegion(face: Face, expr: Expression, id: RegionId, p: Pt, tolerance: number): boolean {
+  const r = getRegion(face.regions, expr, id);
+  if (r.points.length < 2) return false;
+  if (r.kind === 'polyline') return distToPolyline(p, r.points) <= tolerance + 6;
+  if (pointInPolygon(p, r.points)) return true;
+  if (tolerance <= 0) return false;
+  const bb = polyBBox(r.points);
+  const [cx, cy] = centroid(r.points);
+  // Ελλειπτική ανοχή γύρω από το κέντρο: κουμπώνει και λίγο έξω από την περιοχή.
+  const dx = (p[0] - cx) / (bb.w / 2 + tolerance);
+  const dy = (p[1] - cy) / (bb.h / 2 + tolerance);
+  return dx * dx + dy * dy <= 1;
+}
+
+/** Ποιες περιοχές να φωτίζονται όσο σέρνεται ένα καλλυντικό. */
+export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmetic): RegionId[] {
+  const t = cosmetic.target;
+  if (t.kind === 'regions') return t.regions.filter((id) => getRegion(face.regions, expr, id).points.length >= 2);
+  if (t.kind === 'face') return ['faceBox'];
+  return ['skin'];
+}
+
+/** Τι θα ζωγραφιστεί όταν το παιδί αφήσει το καλλυντικό στο σημείο p. */
+export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p: Pt): DropResolution {
+  const t = cosmetic.target;
+  if (t.kind === 'regions') {
+    for (const id of t.regions) {
+      if (!hitsRegion(face, expr, id, p, 24)) continue;
+      const ids: RegionId[] = [id];
+      const twin = MIRROR[id];
+      if (t.mirror && twin && t.regions.includes(twin)) ids.push(twin);
+      // Το άιλάινερ/μάσκαρα στοχεύει τη γραμμή βλεφαρίδων ακόμη κι αν χτυπήσει βλέφαρο/μάτι.
+      const remapped = ids.map((r) => remapToLash(cosmetic, r));
+      const [ax, ay] = centroid(getRegion(face.regions, expr, remapped[0]).points);
+      return { ok: true, regionIds: dedupe(remapped), anchor: [ax, ay] };
+    }
+    return { ok: false };
+  }
+  if (t.kind === 'face') {
+    if (!hitsRegion(face, expr, 'skin', p, 30)) return { ok: false };
+    const [ax, ay] = centroid(getRegion(face.regions, expr, 'skin').points);
+    return { ok: true, regionIds: ['skin'], anchor: [ax, ay] };
+  }
+  if (!pointInPolygon(p, getRegion(face.regions, expr, 'skin').points)) return { ok: false };
+  return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };
+}
+
+function remapToLash(cosmetic: Cosmetic, id: RegionId): RegionId {
+  if (cosmetic.category !== 'eyeliner' && cosmetic.category !== 'mascara') return id;
+  if (id === 'lidL' || id === 'eyeHoleL') return 'lashL';
+  if (id === 'lidR' || id === 'eyeHoleR') return 'lashR';
+  return id;
+}
+
+function dedupe<T>(a: T[]): T[] {
+  return Array.from(new Set(a));
+}

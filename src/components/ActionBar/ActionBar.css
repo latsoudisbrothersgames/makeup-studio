@@ -1,0 +1,73 @@
+.actionbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.actionbar__who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.actionbar__label {
+  font-size: var(--fs-sm);
+  color: var(--text-400);
+}
+
+.actionbar__name {
+  font-size: var(--fs-md);
+  color: var(--plum-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actionbar__btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Στενές οθόνες: μόνο εικονίδια, ίσο πλάτος */
+@media (max-width: 720px) {
+  .actionbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actionbar__btns {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .actionbar__btns .btn {
+    padding: 0.35em 0.1em;
+    min-width: 0;
+    min-height: 60px;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.72rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .actionbar__btns .btn__label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .actionbar__btns .btn__icon {
+    font-size: 1.5rem;
+  }
+  .actionbar__who {
+    padding: 4px 12px;
+  }
+}
