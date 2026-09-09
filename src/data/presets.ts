@@ -52,9 +52,10 @@ function regionIdsFor(cat: CosmeticCategory): AppliedLayer['regionIds'] {
 }
 
 /** Τυχαίο στυλ: `items` διαφορετικές κατηγορίες από το pool του επιπέδου, ντετερμινιστικό ανά seed. */
-export function makePreset(face: Face, level: Level, seed: number): AppliedLayer[] {
+export function makePreset(face: Face, level: Level, seed: number, locked: ReadonlySet<string> = new Set()): AppliedLayer[] {
   const rng = makeRng(seed);
   const pick = <T,>(arr: T[]): T => arr[Math.floor(rng() * arr.length)];
+  const open = (cat: CosmeticCategory, v: string) => !locked.has(`${cat}:${v.toLowerCase()}`);
   const pool = [...level.pool];
   const spots = freeSpots(face);
   const usedSpots = new Set<number>();
@@ -62,8 +63,11 @@ export function makePreset(face: Face, level: Level, seed: number): AppliedLayer
   while (out.length < level.items && pool.length) {
     const cat = pool.splice(Math.floor(rng() * pool.length), 1)[0];
     const def = COSMETICS[cat];
-    const palette = def.palette;
-    const variant = def.variants ? pick(def.variants) : undefined;
+    // Κλειδωμένα χρώματα/παραλλαγές δεν μπαίνουν στον στόχο (ο παίκτης δεν θα μπορούσε να τα βάλει).
+    const palette = def.palette.filter((c) => open(cat, c));
+    const variants = def.variants?.filter((v) => open(cat, v));
+    if (palette.length === 0 || (variants && variants.length === 0)) continue;
+    const variant = variants ? pick(variants) : undefined;
     // Μάσκα/μπογιές: το χρώμα ακολουθεί την παραλλαγή (όπως στο panel).
     const color = def.variants && (cat === 'facePaint' || cat === 'mask') ? palette[def.variants.indexOf(variant!)] ?? palette[0] : pick(palette);
     let at: Pt | undefined;

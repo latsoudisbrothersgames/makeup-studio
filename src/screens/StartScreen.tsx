@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button/Button';
+import { StarBoard } from '../components/StarBoard/StarBoard';
 import { S } from '../data/strings';
 import { useSession } from '../state/SessionContext';
 import { uiUrl } from '../assets';
@@ -25,7 +26,7 @@ export function StartScreen() {
   };
 
   return (
-    <main className="screen start">
+    <main className="screen screen--scroll start">
       <div className="start__hero">
         {title ? <img className="start__art pixelated" src={title} alt="" /> : <div className="start__emoji" aria-hidden="true">💄✨👩</div>}
         <h1 className="screen__title">{S.appTitle}</h1>
@@ -35,6 +36,7 @@ export function StartScreen() {
         <Button size="lg" variant="sun" icon="🏆" onClick={() => nav('/choose?mode=game')} data-action="game">{S.game}</Button>
         <Button size="lg" variant="secondary" icon="🖼️" onClick={() => nav('/gallery')}>{S.gallery}</Button>
       </div>
+      <StarBoard current={session.modelName} />
       <div className="start__footer">
         {document.fullscreenEnabled && (
           <Button variant="ghost" onClick={toggleFs}>{fs ? S.exitFullscreen : S.fullscreen}</Button>

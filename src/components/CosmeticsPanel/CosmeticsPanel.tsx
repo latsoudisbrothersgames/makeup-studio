@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { playSound } from '../../audio/soundManager';
 import { categoriesOf, COSMETICS, GROUPS, VARIANT_LABELS } from '../../data/cosmetics';
 import { accessoryUrl, iconUrl, stickerUrl } from '../../assets';
+import { unlockKey } from '../../data/unlocks';
 import type { DragPayload } from '../../hooks/useDragCosmetic';
 import type { Cosmetic, CosmeticCategory, CosmeticGroup } from '../../types/cosmetic';
 import type { Face } from '../../types/face';
@@ -19,6 +20,9 @@ interface Props {
   sel: PanelSelection;
   onSel(next: PanelSelection): void;
   onStartDrag(e: React.PointerEvent, payload: DragPayload): void;
+  /** Κλειδιά (unlockKey) που είναι ακόμη κλειδωμένα → 🔒, δεν σέρνονται. */
+  locked?: ReadonlySet<string>;
+  onLocked?(key: string): void;
 }
 
 export function paletteFor(c: Cosmetic, face: Face): string[] {
@@ -40,9 +44,10 @@ export function defaultSelection(category: CosmeticCategory, face: Face): PanelS
   return { group: c.group, category, color: palette[Math.min(2, palette.length - 1)] ?? palette[0] ?? '', variant: c.variants?.[0] };
 }
 
-export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
+export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked }: Props) {
   const cats = useMemo(() => categoriesOf(sel.group), [sel.group]);
   const cosmetic = COSMETICS[sel.category];
+  const isLocked = (v: string) => !!locked?.has(unlockKey(cosmetic.category, v));
   const palette = paletteFor(cosmetic, face);
   const isStickers = cosmetic.category === 'sticker';
   const isAccessory = cosmetic.category === 'accessory';
@@ -109,15 +114,18 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
             {cosmetic.variants.map((v, i) => {
               const color = isMask ? cosmetic.palette[i] ?? sel.color : sel.color;
               const st = isStickers ? stickerUrl(v) : isAccessory ? accessoryUrl(v) : undefined;
+              const lockedV = isLocked(v);
               return (
                 <button
                   key={v}
                   type="button"
-                  className={`swatch swatch--variant ${sel.variant === v ? 'is-active' : ''}`}
+                  className={`swatch swatch--variant ${sel.variant === v ? 'is-active' : ''} ${lockedV ? 'is-locked' : ''}`}
                   data-swatch={`${cosmetic.category}:${v}`}
+                  data-locked={lockedV ? '1' : undefined}
                   style={{ background: isMask ? color : undefined }}
-                  onClick={() => onSel({ ...sel, variant: v, color: isMask ? color : sel.color })}
+                  onClick={() => (lockedV ? onLocked?.(unlockKey(cosmetic.category, v)) : onSel({ ...sel, variant: v, color: isMask ? color : sel.color }))}
                   onPointerDown={(e) => {
+                    if (lockedV) return;
                     onSel({ ...sel, variant: v, color: isMask ? color : sel.color });
                     onStartDrag(e, payload(isMask ? color : sel.color, v));
                   }}
@@ -125,6 +133,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
                   title={VARIANT_LABELS[v] ?? v}
                 >
                   {st ? <img src={st} alt="" className="pixelated" draggable={false} /> : <span className="swatch__glyph" style={{ color: isStickers ? sel.color : undefined }}>{variantGlyph(v)}</span>}
+                  {lockedV && <span className="swatch__lock" aria-hidden="true">🔒</span>}
                 </button>
               );
             })}
@@ -132,23 +141,28 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
         )}
         {showSwatches && (
           <div className="panel__swatches">
-            {palette.map((color) => (
-              <button
-                key={color}
-                type="button"
-                className={`swatch ${sel.color === color ? 'is-active' : ''}`}
-                data-swatch={`${cosmetic.category}:${color}`}
-                style={{ background: color }}
-                onClick={() => onSel({ ...sel, color })}
-                onPointerDown={(e) => {
-                  onSel({ ...sel, color });
-                  onStartDrag(e, payload(color, sel.variant));
-                }}
-                aria-label={`${cosmetic.labelEl} ${color}`}
-              >
-                <span className="swatch__emoji" aria-hidden="true">{cosmetic.emoji}</span>
-              </button>
-            ))}
+            {palette.map((color) => {
+              const lockedC = isLocked(color);
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  className={`swatch ${sel.color === color ? 'is-active' : ''} ${lockedC ? 'is-locked' : ''}`}
+                  data-swatch={`${cosmetic.category}:${color}`}
+                  data-locked={lockedC ? '1' : undefined}
+                  style={{ background: color }}
+                  onClick={() => (lockedC ? onLocked?.(unlockKey(cosmetic.category, color)) : onSel({ ...sel, color }))}
+                  onPointerDown={(e) => {
+                    if (lockedC) return;
+                    onSel({ ...sel, color });
+                    onStartDrag(e, payload(color, sel.variant));
+                  }}
+                  aria-label={`${cosmetic.labelEl} ${color}`}
+                >
+                  <span className="swatch__emoji" aria-hidden="true">{lockedC ? '🔒' : cosmetic.emoji}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

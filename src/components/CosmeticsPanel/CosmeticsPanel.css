@@ -252,3 +252,22 @@
   height: 82%;
   object-fit: contain;
 }
+
+/* Κλειδωμένα (ξεκλειδώνουν με αστέρια) */
+.swatch.is-locked {
+  filter: grayscale(0.85) brightness(0.9);
+  cursor: not-allowed;
+  box-shadow: var(--shadow-sm);
+}
+.swatch.is-locked img, .swatch.is-locked .swatch__glyph { opacity: 0.45; }
+.swatch__lock {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  font-size: 1rem;
+  background: #fff;
+  border-radius: 50%;
+  padding: 2px;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+}

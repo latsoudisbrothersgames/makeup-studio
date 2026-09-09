@@ -27,6 +27,8 @@ import { makeThumbnail } from '../engine/thumbnail';
 import { installTestHook, testHooksEnabled } from '../dev/testHook';
 import { useDragCosmetic, type DragPayload } from '../hooks/useDragCosmetic';
 import { useFaceImages } from '../hooks/useFaceImages';
+import { usePlayerStars } from '../hooks/usePlayerStars';
+import { unlockFor } from '../data/unlocks';
 import { loadDraft, loadGallery, newProjectId, sanitizeName, saveDraft, saveProject } from '../storage/gallery';
 import { useSession } from '../state/SessionContext';
 import { initialStudioState, newLayerId, studioReducer } from '../state/studioReducer';
@@ -55,6 +57,7 @@ export function StudioScreen() {
   }, [face]);
 
   const images = useFaceImages(face ?? null);
+  const { locked } = usePlayerStars(session.modelName);
   const [sprites, setSprites] = useState<SpriteMap>({});
   useEffect(() => { void loadSprites().then(setSprites); }, []);
   const compositor = useMemo(
@@ -379,6 +382,8 @@ export function StudioScreen() {
           sel={sel}
           onSel={setSel}
           onStartDrag={(e, p) => drag.startDrag(e, p)}
+          locked={locked}
+          onLocked={(k) => { const u = unlockFor(k); playSound('boing'); setToast(u ? S.lockedHint(u.stars) : S.lockedGeneric); }}
         />
       </div>
       <DragGhost ghost={drag.ghost} ref={drag.ghostRef} />

@@ -131,3 +131,24 @@
   .game__level { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 10px 14px; }
   .game__level-name { flex: 1; text-align: left; }
 }
+
+/* Τρόπος παιχνιδιού (μόνος / δύο) */
+.game__modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
+.game__mode {
+  flex: 1 1 0;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--pink-100);
+  background: var(--surface);
+  font-weight: 700;
+  color: var(--plum-900);
+}
+.game__mode.is-active { border-color: var(--pink-500); background: var(--pink-50); box-shadow: 0 0 0 3px var(--pink-200); }
+.game__names { display: flex; flex-direction: column; gap: 12px; }
+.game__gain { text-align: center; font-weight: 700; color: #d99a00; font-size: var(--fs-lg); }
+.game__unlock { text-align: center; font-weight: 700; color: var(--mint-600); }
+.game__final { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.game__final-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px 12px; border-radius: var(--radius-md); background: var(--pink-50); font-weight: 700; color: var(--plum-900); }
+.game__final-stars { color: #f5b301; font-size: 1.4rem; line-height: 1; }
+.game__final-found { color: var(--text-600); }
