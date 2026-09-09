@@ -125,6 +125,7 @@ export const MIRROR: Partial<Record<RegionId, RegionId>> = {
   underEyeL: 'underEyeR', underEyeR: 'underEyeL',
   browL: 'browR', browR: 'browL',
   eyeHoleL: 'eyeHoleR', eyeHoleR: 'eyeHoleL',
+  accL: 'accR', accR: 'accL',
 };
 
 /** Ντετερμινιστικός PRNG (mulberry32). */

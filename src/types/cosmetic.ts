@@ -20,7 +20,8 @@ export type CosmeticCategory =
   | 'hairStreak'
   | 'facePaint'
   | 'lipLiner'
-  | 'remover';
+  | 'remover'
+  | 'accessory';
 
 export type CosmeticGroup = 'face' | 'eyes' | 'lips' | 'hair' | 'fun';
 
@@ -65,4 +66,7 @@ export interface AppliedLayer {
   regionIds: RegionId[];
   at?: Pt;
   seed: number;
+  /** Αξεσουάρ: διακοσμητικό αυτοκόλλητο (heart/star/…) πάνω στο κοκαλάκι/στέκα, και το χρώμα του. */
+  deco?: string;
+  decoColor?: string;
 }

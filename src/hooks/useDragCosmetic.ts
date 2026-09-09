@@ -77,7 +77,7 @@ export function useDragCosmetic(opts: Options) {
       const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
       const fp = stage.clientToFace(clientX, clientY - lift);
       a.lastFacePt = fp;
-      res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp);
+      res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp, a.payload.variant);
     }
     if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
     try {
@@ -117,14 +117,14 @@ export function useDragCosmetic(opts: Options) {
     const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
     const fp = stage.clientToFace(e.clientX, e.clientY - lift);
     a.lastFacePt = fp;
-    const res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp);
+    const res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp, a.payload.variant);
     // ΠΑΝΤΑ η τελευταία ανάλυση: για ελεύθερη τοποθέτηση (αυτοκόλλητα, γκλίτερ, βαμβάκι) το anchor
     // αλλάζει σε κάθε κίνηση, ενώ οι περιοχές (key) δεν αλλάζουν — αλλιώς «κλειδώνει» στο σημείο εισόδου.
     a.lastRes = res;
     const key = res.ok ? res.regionIds.join('+') || 'free' : 'no';
     if (key !== a.lastKey) {
       a.lastKey = key;
-      o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic), res);
+      o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic, a.payload.variant), res);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -175,7 +175,7 @@ export function useDragCosmetic(opts: Options) {
     if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
     setGhost({ ...payload, pointerType: e.pointerType });
     const o = optsRef.current;
-    o.onHover(payload, candidateRegions(o.face, o.exprRef.current, payload.cosmetic), null);
+    o.onHover(payload, candidateRegions(o.face, o.exprRef.current, payload.cosmetic, payload.variant), null);
     requestAnimationFrame(() => {
       const g = ghostRef.current;
       if (g) {

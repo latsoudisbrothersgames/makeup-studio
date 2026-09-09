@@ -12,6 +12,8 @@ npm run shots      # στιγμιότυπα desktop/laptop/iPad/iPhone με το
 ```
 
 ## Δομή
+- Αξεσουάρ μαλλιών (`src/data/accessories.ts`, sprites `src/assets/accessories/ac_{clip,bow,band,tiara}.png` 4 γεννήσεις PixelLab, χρώμα με αντικατάσταση παλέτας): 3 θέσεις = περιοχές `accL/accR/accTop` (κύκλοι r=30 γύρω από τις άγκυρες), singleton ανά θέση, στέκα/τιάρα μόνο κορυφή, σχεδιάζονται ΠΑΝΩ από τα μαλλιά (`Pass.aboveHair`)· αυτοκόλλητο πάνω σε θέση με στολίδι → διακοσμητικό του (`deco`)· τα sprites είναι και εικονίδια στο μενού
+- `tools/icon_clean.py` — καθαρίζει «σκουπίδια» γύρω από εικονίδια pixen (κρατά τη μεγαλύτερη νησίδα)
 - Παιχνίδι «Αντίγραψε το στυλ» (`#/game`, `src/screens/GameScreen.tsx`, `src/data/presets.ts`): αριστερά τυχαίο έτοιμο στυλ ανά επίπεδο (3/5/7 πράγματα, 2/2/2½ λεπτά), δεξιά το ίδιο κορίτσι, χρονόμετρο, «✓ n/N», αστέρια στο τέλος· ταίριασμα = ίδια κατηγορία + κοντινό χρώμα (RGB ≤ 70) ή ίδια παραλλαγή, ελεύθερα αντικείμενα ≤ 60px
 - Εργαλεία χωρίς εικαστικά (v2): μπογιές προσώπου (`facePaint`: γατούλα/ουράνιο τόξο, σχεδιάζονται πάνω στις περιοχές), μολύβι χειλιών, βαμβάκι ντεμακιγιάζ (`remover`: αφαιρεί το πιο πρόσφατο στρώμα στο σημείο, μπαίνει στο history), «Φωτογράφισε» (`engine/exportImage.ts`: 1024×1180 PNG, Web Share σε αφή / λήψη σε desktop)
 - `src/engine/` — compositor (blend modes + φτερωτές μάσκες), συνταγές καλλυντικών, hit-test, animator
@@ -22,6 +24,7 @@ npm run shots      # στιγμιότυπα desktop/laptop/iPad/iPhone με το
 - Περιοχές μαλλιών στο JSON: `hairStreak` (πλαϊνή τούφα για δεύτερο χρώμα)· άγκυρες `accL/accR/accTop` (θέσεις αξεσουάρ, ορίζονται στον editor με ⌖)
 - `tools/pl.py`, `tools/face_variants.py`, `tools/face_grid.py` — PixelLab pipeline· `#/dev/regions?face=f1` — επεξεργαστής περιοχών (πολύγωνα + άγκυρες)
 - `node tools/hairshot.mjs [--ui]` — στιγμιότυπα βαφής+τούφας στα 4 πρόσωπα και του panel «Μαλλιά» (iPhone/desktop)
+- `node tools/accshot.mjs` — αξεσουάρ+διακοσμητικά σε 4 πρόσωπα (με πραγματικό drop αυτοκόλλητου στη θέση) και panel «Στολίδια» iPhone
 - `node tools/gameshot.mjs` — ροή παιχνιδιού (επίπεδο 2, μερική πρόοδος, νίκη) σε desktop+iPhone· `node tools/dragtest.mjs` — ακρίβεια drop αυτοκόλλητου σε 3 σημεία
 - `node tools/paintshot.mjs`, `node tools/step3shot.mjs` — στιγμιότυπα μπογιών/μολυβιού και καρτών/φωτογραφίας (iPhone+desktop, με έλεγχο λήψης PNG)
 - `node tools/maskshot.mjs` — στιγμιότυπα μάσκας+μακιγιάζ στα 4 πρόσωπα (έλεγχος ότι τα μαλλιά καλύπτουν τη μάσκα)

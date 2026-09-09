@@ -3,6 +3,8 @@ import type { Expression, Face, Poly, Pt, RegionId } from '../types/face';
 import { makeCanvas, ctx2d } from './canvas';
 import { centroid, expandBBox, makeRng, polyBBox, samplePolyline, tracePoly, tracePolyline, type BBox } from './geometry';
 import { clipMask, cutHoles, featheredMask, type MaskBitmap } from './masks';
+import { ACCESSORY_DRAW, TOP_SLOT_DY } from '../data/accessories';
+import { rampFor, recolorImage } from './hairColor';
 
 /** Ένα πέρασμα σύνθεσης: bitmap σε τοπικές συντεταγμένες bbox + τρόπος ανάμειξης. */
 export interface Pass {
@@ -13,6 +15,8 @@ export interface Pass {
   alpha: number;
   /** Συμμετέχει στον «παλμό» του ρουζ. */
   pulse?: boolean;
+  /** Σχεδιάζεται ΠΑΝΩ από το επίπεδο μαλλιών (αξεσουάρ). */
+  aboveHair?: boolean;
 }
 
 export interface RecipeEnv {
@@ -317,6 +321,36 @@ const lipLiner: Recipe = (layer, _c, env) => {
   return [{ canvas: c, x: bb.x, y: bb.y, blend: 'multiply', alpha: 0.8 * env.face.tuning.multiply }];
 };
 
+const recolorCache = new Map<string, HTMLCanvasElement>();
+
+/** Αξεσουάρ μαλλιών: sprite βαμμένο με παλέτα, στη θέση της άγκυρας, πάνω από τα μαλλιά, με προαιρετικό διακοσμητικό. */
+const accessory: Recipe = (layer, _c, env) => {
+  const variant = layer.variant ?? 'clip';
+  const slot = layer.regionIds[0];
+  const anchor = env.face.regions.anchors[slot as 'accL' | 'accR' | 'accTop'];
+  const sprite = env.sprite(`ac_${variant}`);
+  if (!anchor || !sprite) return [];
+  const d = ACCESSORY_DRAW[variant] ?? ACCESSORY_DRAW.clip;
+  const key = `${variant}|${layer.color}`;
+  let tinted = recolorCache.get(key);
+  if (!tinted) {
+    tinted = recolorImage(sprite, rampFor(layer.color), sprite.width, sprite.height);
+    if (recolorCache.size > 64) recolorCache.clear();
+    recolorCache.set(key, tinted);
+  }
+  const w = sprite.width * d.scale, h = sprite.height * d.scale;
+  const cx = anchor[0] + d.dx, cy = anchor[1] + d.dy + (slot === 'accTop' && (variant === 'clip' || variant === 'bow') ? TOP_SLOT_DY : 0);
+  const deco = layer.deco ? env.sprite(`st_${layer.deco}`) : undefined;
+  const pad = 30;
+  const bb = expandBBox({ x: cx - w / 2 - pad, y: cy - h / 2 - pad, w: w + pad * 2, h: h + pad * 2 }, 0);
+  const c = makeCanvas(bb.w, bb.h);
+  const ctx = ctx2d(c);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tinted, Math.round(cx - w / 2 - bb.x), Math.round(cy - h / 2 - bb.y), w, h);
+  if (deco) ctx.drawImage(deco, Math.round(cx - deco.width / 2 - bb.x), Math.round(cy + d.decoDy - deco.height / 2 - bb.y));
+  return [{ canvas: c, x: bb.x, y: bb.y, blend: 'source-over', alpha: 1, aboveHair: true }];
+};
+
 const mask: Recipe = (layer, _c, env) => {
   const m = copyMask(env.mask('faceBox', 1));
   cutHoles(m, [env.points('eyeHoleL'), env.points('eyeHoleR'), env.points('mouthHole')], 2);
@@ -506,6 +540,7 @@ export const RECIPES: Record<Cosmetic['category'], Recipe> = {
   lipLiner,
   // Το βαμβάκι δεν ζωγραφίζει: αφαιρεί στρώμα (βλ. StudioScreen.onDrop).
   remover: () => [],
+  accessory,
 };
 
 export { featheredMask, clipMask, tracePoly };

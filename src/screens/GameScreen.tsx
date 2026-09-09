@@ -16,6 +16,7 @@ import { FaceAnimator, type Particle } from '../engine/animator';
 import { Compositor, type SpriteMap } from '../engine/compositor';
 import type { DropResolution } from '../engine/hitTest';
 import { layerAt } from '../engine/layerAt';
+import { decorateAccessory, isAccessorySlot } from '../data/accessories';
 import { useDragCosmetic, type DragPayload } from '../hooks/useDragCosmetic';
 import { useFaceImages } from '../hooks/useFaceImages';
 import { useSession } from '../state/SessionContext';
@@ -156,6 +157,13 @@ export function GameScreen() {
       const target = layerAt(face, exprRef.current, layersRef.current, res.anchor);
       if (target) { dispatch({ type: 'remove', id: target.id }); playSound('clear'); setHint({ text: S.hintRemoved, mood: 'good' }); }
       else { playSound('boing'); setHint({ text: S.hintNothingToRemove, mood: 'bad' }); }
+      window.setTimeout(() => setHint((h) => (h.mood === 'idle' ? h : { text: S.gameHintIdle, mood: 'idle' })), 1400);
+      return;
+    }
+    if (p.cosmetic.category === 'sticker' && isAccessorySlot(res.regionIds[0])) {
+      const deco = decorateAccessory(layersRef.current, res.regionIds[0], p.variant ?? 'heart', p.color, newLayerId());
+      if (deco) applyLayer(deco, res.anchor);
+      else { playSound('boing'); setHint({ text: S.hintNoAccessory, mood: 'bad' }); }
       window.setTimeout(() => setHint((h) => (h.mood === 'idle' ? h : { text: S.gameHintIdle, mood: 'idle' })), 1400);
       return;
     }

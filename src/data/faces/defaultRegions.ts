@@ -133,6 +133,9 @@ export function buildRegionMap(p: FaceParams = DEFAULT_PARAMS): RegionMap {
     browR: poly('browR', brow(p, exR, 1)),
     hair: poly('hair', ellipsePoly(cx, p.cy - p.ry * 0.55, p.rx * 1.15, p.ry * 0.6, 20)),
     hairStreak: poly('hairStreak', []),
+    accL: poly('accL', ellipsePoly(cx - p.rx * 0.95, p.cy - p.ry * 0.55, 30, 30, 12)),
+    accR: poly('accR', ellipsePoly(cx + p.rx * 0.95, p.cy - p.ry * 0.55, 30, 30, 12)),
+    accTop: poly('accTop', ellipsePoly(cx, p.cy - p.ry * 1.1, 30, 30, 12)),
   } satisfies Record<RegionId, Region>;
 
   const eyeWowL = ellipsePoly(exL, eyeY - 2, eyeRX + 2, eyeRY + 6, 16);

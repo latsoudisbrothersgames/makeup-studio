@@ -60,6 +60,7 @@ export const S = {
   hintCleared: 'Καθαρό πρόσωπο! Ξεκίνα ξανά',
   hintRemoved: 'Σβήστηκε!',
   hintNothingToRemove: 'Δεν υπάρχει κάτι εδώ για σβήσιμο',
+  hintNoAccessory: 'Βάλε πρώτα ένα στολίδι εκεί',
 
   groupFace: 'Πρόσωπο',
   groupEyes: 'Μάτια',

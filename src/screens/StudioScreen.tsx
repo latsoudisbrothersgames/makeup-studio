@@ -18,6 +18,7 @@ import { loadSprites } from '../assets/sprites';
 import { FaceAnimator, type Particle } from '../engine/animator';
 import { Compositor, type SpriteMap } from '../engine/compositor';
 import { layerAt } from '../engine/layerAt';
+import { decorateAccessory, isAccessorySlot } from '../data/accessories';
 import { centroid } from '../engine/geometry';
 import type { DropResolution } from '../engine/hitTest';
 import { hairCentroid } from '../engine/hairMask';
@@ -175,6 +176,13 @@ export function StudioScreen() {
         setHint({ text: S.hintNothingToRemove, mood: 'bad' });
       }
       window.setTimeout(() => setHint((h) => (h.text === S.hintRemoved || h.text === S.hintNothingToRemove ? { text: S.hintIdle, mood: 'idle' } : h)), 1600);
+      return;
+    }
+    if (p.cosmetic.category === 'sticker' && isAccessorySlot(res.regionIds[0])) {
+      const deco = decorateAccessory(layersRef.current, res.regionIds[0], p.variant ?? 'heart', p.color, newLayerId());
+      if (deco) { applyLayer(deco, res.anchor); setHint({ text: S.hintDone, mood: 'good' }); }
+      else { playSound('boing'); setHint({ text: S.hintNoAccessory, mood: 'bad' }); }
+      window.setTimeout(() => setHint((h) => (h.mood === 'idle' ? h : { text: S.hintIdle, mood: 'idle' })), 1400);
       return;
     }
     const layer: AppliedLayer = {

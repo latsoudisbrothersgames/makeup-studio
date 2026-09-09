@@ -3,6 +3,7 @@ import type { Face, Pt } from '../types/face';
 import { COSMETICS } from './cosmetics';
 import { centroid, makeRng } from '../engine/geometry';
 import { newLayerId } from '../state/studioReducer';
+import { slotsFor } from './accessories';
 
 /**
  * Παιχνίδι «Αντίγραψε το στυλ»: τυχαίο έτοιμο στυλ ανά επίπεδο και έλεγχος αντιγραφής.
@@ -19,8 +20,8 @@ export interface Level {
 
 export const LEVELS: Level[] = [
   { id: 1, labelEl: 'Εύκολο', emoji: '🌱', items: 3, seconds: 120, pool: ['lipstick', 'blush', 'eyeshadow', 'hairColor', 'sticker', 'facePaint'] },
-  { id: 2, labelEl: 'Μεσαίο', emoji: '🌼', items: 5, seconds: 120, pool: ['lipstick', 'blush', 'eyeshadow', 'hairColor', 'sticker', 'facePaint', 'glitter', 'freckles', 'hairStreak', 'eyeliner'] },
-  { id: 3, labelEl: 'Δύσκολο', emoji: '🔥', items: 7, seconds: 150, pool: ['lipstick', 'blush', 'eyeshadow', 'hairColor', 'sticker', 'facePaint', 'glitter', 'freckles', 'hairStreak', 'eyeliner', 'mascara', 'gloss', 'lipLiner', 'beautySpot'] },
+  { id: 2, labelEl: 'Μεσαίο', emoji: '🌼', items: 5, seconds: 120, pool: ['lipstick', 'blush', 'eyeshadow', 'hairColor', 'sticker', 'facePaint', 'glitter', 'freckles', 'hairStreak', 'eyeliner', 'accessory'] },
+  { id: 3, labelEl: 'Δύσκολο', emoji: '🔥', items: 7, seconds: 150, pool: ['lipstick', 'blush', 'eyeshadow', 'hairColor', 'sticker', 'facePaint', 'glitter', 'freckles', 'hairStreak', 'eyeliner', 'mascara', 'gloss', 'lipLiner', 'beautySpot', 'accessory'] },
 ];
 
 export function levelById(id: number | null | undefined): Level {
@@ -72,7 +73,8 @@ export function makePreset(face: Face, level: Level, seed: number): AppliedLayer
       usedSpots.add(i);
       at = spots[i];
     }
-    out.push({ id: newLayerId(), category: cat, color, variant, regionIds: regionIdsFor(cat), at, seed: Math.floor(rng() * 1e9) });
+    const regionIds = cat === 'accessory' ? [pick(slotsFor(variant))] : regionIdsFor(cat);
+    out.push({ id: newLayerId(), category: cat, color, variant, regionIds, at, seed: Math.floor(rng() * 1e9) });
   }
   return out;
 }
@@ -97,6 +99,7 @@ const FREE_TOLERANCE = 60;
 export function matches(target: AppliedLayer, l: AppliedLayer): boolean {
   if (l.category !== target.category) return false;
   if (VARIANT_ONLY.has(target.category) && l.variant !== target.variant) return false;
+  if (target.category === 'accessory' && (l.variant !== target.variant || l.regionIds[0] !== target.regionIds[0])) return false;
   if (!VARIANT_ONLY.has(target.category)) {
     if (EXACT_COLOR.has(target.category) ? l.color.toLowerCase() !== target.color.toLowerCase() : !sameColor(l.color, target.color)) return false;
   }

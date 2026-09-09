@@ -31,12 +31,16 @@ export type RegionId =
   /** Όλα τα μαλλιά (γενναιόδωρο περίγραμμα, στόχος για βαφή/αξεσουάρ). */
   | 'hair'
   /** Η πλαϊνή τούφα που παίρνει δεύτερο χρώμα. */
-  | 'hairStreak';
+  | 'hairStreak'
+  /** Θέσεις αξεσουάρ μαλλιών (κύκλοι γύρω από τις άγκυρες accL/accR/accTop). */
+  | 'accL'
+  | 'accR'
+  | 'accTop';
 
 export const REGION_IDS: RegionId[] = [
   'skin', 'faceBox', 'lips', 'mouthHole', 'eyeHoleL', 'eyeHoleR', 'cheekL', 'cheekR',
   'cheekboneL', 'cheekboneR', 'tzone', 'noseBridge', 'lidL', 'lidR', 'lashL', 'lashR',
-  'underEyeL', 'underEyeR', 'browL', 'browR', 'hair', 'hairStreak',
+  'underEyeL', 'underEyeR', 'browL', 'browR', 'hair', 'hairStreak', 'accL', 'accR', 'accTop',
 ];
 
 /** Οι περιοχές που είναι πολυγραμμές (γραμμή βλεφαρίδων) και όχι πολύγωνα. */

@@ -69,6 +69,12 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
     category: 'beautySpot', group: 'face', labelEl: 'Ελιά', hintEl: 'Άφησε την ελιά όπου θέλεις στο πρόσωπο', emoji: '⚫',
     target: { kind: 'free' }, palette: ['#3e2723', '#212121'], anim: 'smile', zRank: 11, singleton: false,
   },
+  accessory: {
+    category: 'accessory', group: 'hair', labelEl: 'Στολίδια', hintEl: 'Άφησε το στολίδι αριστερά, δεξιά ή στην κορυφή', emoji: '🎀',
+    target: { kind: 'regions', regions: ['accL', 'accR', 'accTop'], mirror: false },
+    palette: ['#ff7fbf', '#e53935', '#f5b301', '#4f86ea', '#9a5ed8', '#3fd0c9', '#f4f4f4', '#2b2834'],
+    variants: ['clip', 'bow', 'band', 'tiara'], anim: 'smile', zRank: 30, singleton: true,
+  },
   facePaint: {
     category: 'facePaint', group: 'fun', labelEl: 'Μπογιές', hintEl: 'Άφησε τη μπογιά πάνω στο πρόσωπο', emoji: '🎭',
     target: { kind: 'face' },
@@ -115,7 +121,7 @@ export const CATEGORY_ORDER: CosmeticCategory[] = [
   'foundation', 'concealer', 'blush', 'highlighter', 'freckles', 'beautySpot', 'mask',
   'eyeshadow', 'eyeliner', 'mascara', 'brow',
   'lipstick', 'lipLiner', 'gloss',
-  'hairColor', 'hairStreak',
+  'hairColor', 'hairStreak', 'accessory',
   'facePaint', 'glitter', 'sticker', 'remover',
 ];
 
@@ -128,4 +134,5 @@ export const VARIANT_LABELS: Record<string, string> = {
   sheet: 'Υφασμάτινη', cream: 'Κρέμα', clay: 'Άργιλος',
   heart: 'Καρδιά', star: 'Αστέρι', gem: 'Πετράδι', flower: 'Λουλούδι', butterfly: 'Πεταλούδα',
   cat: 'Γατούλα', rainbow: 'Ουράνιο τόξο',
+  clip: 'Κοκαλάκι', bow: 'Φιόγκος', band: 'Στέκα', tiara: 'Τιάρα',
 };

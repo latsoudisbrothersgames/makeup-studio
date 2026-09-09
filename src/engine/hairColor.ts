@@ -54,10 +54,15 @@ function interpRamp(ramp: Ramp, t: number): [number, number, number] {
 
 /** Επιστρέφει νέο καμβά 512×512 με τα μαλλιά βαμμένα στη ράμπα. */
 export function recolorHair(hair: CanvasImageSource, ramp: Ramp): HTMLCanvasElement {
-  const c = makeCanvas(512, 512);
+  return recolorImage(hair, ramp, 512, 512);
+}
+
+/** Γενική αντικατάσταση παλέτας (ίδια μέθοδος) για οποιοδήποτε sprite, π.χ. αξεσουάρ. */
+export function recolorImage(src: CanvasImageSource, ramp: Ramp, w: number, h: number): HTMLCanvasElement {
+  const c = makeCanvas(w, h);
   const ctx = ctx2d(c);
-  ctx.drawImage(hair, 0, 0);
-  const img = ctx.getImageData(0, 0, 512, 512);
+  ctx.drawImage(src, 0, 0);
+  const img = ctx.getImageData(0, 0, w, h);
   const d = img.data;
 
   // Μοναδικά χρώματα → φωτεινότητα → t.

@@ -1,4 +1,4 @@
-import { stickerUrls } from './index';
+import { accessoryUrls, stickerUrls } from './index';
 import { loadImage } from '../engine/canvas';
 import type { SpriteMap } from '../engine/compositor';
 
@@ -9,7 +9,7 @@ export function loadSprites(): Promise<SpriteMap> {
   if (!spriteCache) {
     spriteCache = (async () => {
       const out: SpriteMap = {};
-      for (const [name, url] of Object.entries(stickerUrls())) {
+      for (const [name, url] of Object.entries({ ...stickerUrls(), ...accessoryUrls() })) {
         try { out[name] = await loadImage(url); } catch { /* παραλείπεται */ }
       }
       return out;

@@ -104,8 +104,10 @@ export class Compositor {
     }
     ctx.clearRect(0, 0, 512, 512);
     ctx.drawImage(this.images[expr], 0, 0);
+    const aboveHair: Pass[] = [];
     for (const layer of this.sorted(layers)) {
       for (const p of this.passesFor(layer, expr)) {
+        if (p.aboveHair) { aboveHair.push(p); continue; }
         ctx.globalCompositeOperation = p.blend;
         ctx.globalAlpha = Math.min(1, p.alpha * (p.pulse ? pulse : 1));
         ctx.drawImage(p.canvas, p.x, p.y);
@@ -115,6 +117,13 @@ export class Compositor {
     ctx.globalAlpha = 1;
     const hair = this.hairImage(layers);
     if (hair) ctx.drawImage(hair, 0, 0);
+    for (const p of aboveHair) {
+      ctx.globalCompositeOperation = p.blend;
+      ctx.globalAlpha = p.alpha;
+      ctx.drawImage(p.canvas, p.x, p.y);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
     if (pulse === 1) {
       const snap = makeCanvas(512, 512);
       ctx2d(snap).drawImage(this.out, 0, 0);

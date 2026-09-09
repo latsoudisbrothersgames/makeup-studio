@@ -3,6 +3,7 @@ import type { Expression, Face, Pt, RegionId } from '../types/face';
 import { centroid, distToPolyline, MIRROR, pointInPolygon, polyBBox } from './geometry';
 import { getRegion } from './regions';
 import { hairCentroid, hairHit } from './hairMask';
+import { ACCESSORY_SLOTS, slotsFor } from '../data/accessories';
 
 export type DropResolution =
   | { ok: true; regionIds: RegionId[]; anchor: Pt }
@@ -23,8 +24,9 @@ function hitsRegion(face: Face, expr: Expression, id: RegionId, p: Pt, tolerance
 }
 
 /** Ποιες περιοχές να φωτίζονται όσο σέρνεται ένα καλλυντικό. */
-export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmetic): RegionId[] {
+export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmetic, variant?: string): RegionId[] {
   const t = cosmetic.target;
+  if (cosmetic.category === 'accessory') return slotsFor(variant);
   if (t.kind === 'regions') return t.regions.filter((id) => getRegion(face.regions, expr, id).points.length >= 2);
   if (t.kind === 'face') return ['faceBox'];
   if (t.kind === 'hair') return ['hair'];
@@ -33,10 +35,11 @@ export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmeti
 }
 
 /** Τι θα ζωγραφιστεί όταν το παιδί αφήσει το καλλυντικό στο σημείο p. */
-export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p: Pt): DropResolution {
+export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p: Pt, variant?: string): DropResolution {
   const t = cosmetic.target;
   if (t.kind === 'regions') {
-    for (const id of t.regions) {
+    const regions = cosmetic.category === 'accessory' ? slotsFor(variant) : t.regions;
+    for (const id of regions) {
       if (!hitsRegion(face, expr, id, p, 24)) continue;
       const ids: RegionId[] = [id];
       const twin = MIRROR[id];
@@ -60,6 +63,12 @@ export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p:
   if (t.kind === 'hair') {
     if (!hairHit(face.id, p, 22)) return { ok: false };
     return { ok: true, regionIds: ['hair'], anchor: hairCentroid(face.id) };
+  }
+  // Αυτοκόλλητο πάνω σε θέση αξεσουάρ → διακοσμητικό (βλ. decorateAccessory).
+  if (cosmetic.category === 'sticker') {
+    for (const id of ACCESSORY_SLOTS) {
+      if (hitsRegion(face, expr, id, p, 8)) return { ok: true, regionIds: [id], anchor: centroid(getRegion(face.regions, expr, id).points) };
+    }
   }
   if (!pointInPolygon(p, getRegion(face.regions, expr, 'skin').points)) return { ok: false };
   return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };

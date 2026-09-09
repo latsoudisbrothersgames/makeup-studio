@@ -245,3 +245,10 @@
     min-height: 60px;
   }
 }
+
+/* Παραλλαγές με sprites διαφορετικών αναλογιών (π.χ. στέκα 224×64): χωρίς παραμόρφωση */
+.swatch--variant img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}

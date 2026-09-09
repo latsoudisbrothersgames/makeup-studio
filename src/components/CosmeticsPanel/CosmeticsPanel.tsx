@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { playSound } from '../../audio/soundManager';
 import { categoriesOf, COSMETICS, GROUPS, VARIANT_LABELS } from '../../data/cosmetics';
-import { iconUrl, stickerUrl } from '../../assets';
+import { accessoryUrl, iconUrl, stickerUrl } from '../../assets';
 import type { DragPayload } from '../../hooks/useDragCosmetic';
 import type { Cosmetic, CosmeticCategory, CosmeticGroup } from '../../types/cosmetic';
 import type { Face } from '../../types/face';
@@ -45,6 +45,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
   const cosmetic = COSMETICS[sel.category];
   const palette = paletteFor(cosmetic, face);
   const isStickers = cosmetic.category === 'sticker';
+  const isAccessory = cosmetic.category === 'accessory';
   // Μάσκα και μπογιές: επιλέγονται μόνο παραλλαγές (κάθε παραλλαγή έχει το χρώμα της), όχι swatches.
   const isMask = cosmetic.category === 'mask' || cosmetic.category === 'facePaint';
   const showSwatches = !isMask && palette.length > 1;
@@ -73,7 +74,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
 
       <div className="panel__cats" role="list">
         {cats.map((c) => {
-          const url = iconUrl(c.category);
+          const url = iconUrl(c.category) ?? (c.category === 'accessory' ? accessoryUrl('bow') : undefined);
           const active = c.category === sel.category;
           return (
             <button
@@ -103,11 +104,11 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
 
       <div className="panel__swatches-wrap">
         <p className="panel__hint">{cosmetic.hintEl}</p>
-        {(isStickers || isMask) && cosmetic.variants && (
+        {(isStickers || isMask || isAccessory) && cosmetic.variants && (
           <div className="panel__variants">
             {cosmetic.variants.map((v, i) => {
               const color = isMask ? cosmetic.palette[i] ?? sel.color : sel.color;
-              const st = isStickers ? stickerUrl(v) : undefined;
+              const st = isStickers ? stickerUrl(v) : isAccessory ? accessoryUrl(v) : undefined;
               return (
                 <button
                   key={v}
