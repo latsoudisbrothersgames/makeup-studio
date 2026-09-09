@@ -3,6 +3,7 @@ import { playSound } from '../../audio/soundManager';
 import { categoriesOf, COSMETICS, GROUPS, VARIANT_LABELS } from '../../data/cosmetics';
 import { accessoryUrl, iconUrl, stickerUrl } from '../../assets';
 import { unlockKey } from '../../data/unlocks';
+import { useHairstyleThumbs } from '../../hooks/useHairstyleThumbs';
 import type { DragPayload } from '../../hooks/useDragCosmetic';
 import type { Cosmetic, CosmeticCategory, CosmeticGroup } from '../../types/cosmetic';
 import type { Face } from '../../types/face';
@@ -51,8 +52,12 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked
   const palette = paletteFor(cosmetic, face);
   const isStickers = cosmetic.category === 'sticker';
   const isAccessory = cosmetic.category === 'accessory';
+  const isHairstyle = cosmetic.category === 'hairstyle';
+  const styleThumbs = useHairstyleThumbs(face);
   // Μάσκα και μπογιές: επιλέγονται μόνο παραλλαγές (κάθε παραλλαγή έχει το χρώμα της), όχι swatches.
-  const isMask = cosmetic.category === 'mask' || cosmetic.category === 'facePaint';
+  const isMask = cosmetic.category === 'mask' || cosmetic.category === 'facePaint' || cosmetic.category === 'hairstyle';
+  // Χτενίσματα: «Αρχικό» + όσα έχουν εικόνες για αυτό το πρόσωπο.
+  const variants = cosmetic.category === 'hairstyle' ? ['original', ...Object.keys(face.styles ?? {})] : cosmetic.variants;
   const showSwatches = !isMask && palette.length > 1;
 
   const payload = (color: string, variant?: string): DragPayload => ({ cosmetic, color, variant });
@@ -109,11 +114,11 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked
 
       <div className="panel__swatches-wrap">
         <p className="panel__hint">{cosmetic.hintEl}</p>
-        {(isStickers || isMask || isAccessory) && cosmetic.variants && (
+        {(isStickers || isMask || isAccessory) && variants && (
           <div className="panel__variants">
-            {cosmetic.variants.map((v, i) => {
+            {variants.map((v, i) => {
               const color = isMask ? cosmetic.palette[i] ?? sel.color : sel.color;
-              const st = isStickers ? stickerUrl(v) : isAccessory ? accessoryUrl(v) : undefined;
+              const st = isStickers ? stickerUrl(v) : isAccessory ? accessoryUrl(v) : isHairstyle ? styleThumbs[v] : undefined;
               const lockedV = isLocked(v);
               return (
                 <button
@@ -177,6 +182,8 @@ function variantGlyph(v: string): string {
     case 'gem': return '◆';
     case 'flower': return '✿';
     case 'butterfly': return '🦋';
+    case 'original': return '💁';
+    case 'bob': return '💇';
     case 'cat': return '🐱';
     case 'rainbow': return '🌈';
     case 'sheet': return '🧻';

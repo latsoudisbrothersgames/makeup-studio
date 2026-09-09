@@ -69,6 +69,10 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
     category: 'beautySpot', group: 'face', labelEl: 'Ελιά', hintEl: 'Άφησε την ελιά όπου θέλεις στο πρόσωπο', emoji: '⚫',
     target: { kind: 'free' }, palette: ['#3e2723', '#212121'], anim: 'smile', zRank: 11, singleton: false,
   },
+  hairstyle: {
+    category: 'hairstyle', group: 'hair', labelEl: 'Χτένισμα', hintEl: 'Άφησε το χτένισμα πάνω στα μαλλιά', emoji: '💇',
+    target: { kind: 'hair' }, palette: ['#e9c56b', '#e9c56b'], variants: ['original', 'bob'], anim: 'wow', zRank: 19, singleton: true,
+  },
   accessory: {
     category: 'accessory', group: 'hair', labelEl: 'Στολίδια', hintEl: 'Άφησε το στολίδι αριστερά, δεξιά ή στην κορυφή', emoji: '🎀',
     target: { kind: 'regions', regions: ['accL', 'accR', 'accTop'], mirror: false },
@@ -121,7 +125,7 @@ export const CATEGORY_ORDER: CosmeticCategory[] = [
   'foundation', 'concealer', 'blush', 'highlighter', 'freckles', 'beautySpot', 'mask',
   'eyeshadow', 'eyeliner', 'mascara', 'brow',
   'lipstick', 'lipLiner', 'gloss',
-  'hairColor', 'hairStreak', 'accessory',
+  'hairColor', 'hairStreak', 'hairstyle', 'accessory',
   'facePaint', 'glitter', 'sticker', 'remover',
 ];
 
@@ -135,4 +139,5 @@ export const VARIANT_LABELS: Record<string, string> = {
   heart: 'Καρδιά', star: 'Αστέρι', gem: 'Πετράδι', flower: 'Λουλούδι', butterfly: 'Πεταλούδα',
   cat: 'Γατούλα', rainbow: 'Ουράνιο τόξο',
   clip: 'Κοκαλάκι', bow: 'Φιόγκος', band: 'Στέκα', tiara: 'Τιάρα',
+  original: 'Αρχικό', bob: 'Καρέ',
 };

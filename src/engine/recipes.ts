@@ -541,6 +541,8 @@ export const RECIPES: Record<Cosmetic['category'], Recipe> = {
   // Το βαμβάκι δεν ζωγραφίζει: αφαιρεί στρώμα (βλ. StudioScreen.onDrop).
   remover: () => [],
   accessory,
+  // Το χτένισμα αλλάζει βάση + επίπεδο μαλλιών στον Compositor (styleOf), δεν είναι πέρασμα.
+  hairstyle: () => [],
 };
 
 export { featheredMask, clipMask, tracePoly };

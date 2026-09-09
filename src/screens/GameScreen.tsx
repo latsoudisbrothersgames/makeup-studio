@@ -66,7 +66,7 @@ export function GameScreen() {
   const [sprites, setSprites] = useState<SpriteMap>({});
   useEffect(() => { void loadSprites().then(setSprites); }, []);
   const compositor = useMemo(() => (images ? new Compositor(face, images, COSMETICS, sprites) : null), [face, images, sprites]);
-  const targetCompositor = useMemo(() => (images ? new Compositor(face, images, COSMETICS, sprites) : null), [face, images, sprites]);
+  const targetCompositor = useMemo(() => (images ? new Compositor(face, images, COSMETICS, sprites, false) : null), [face, images, sprites]);
 
   // ── Παιχνίδι ──────────────────────────────────────────────────────
   const [phase, setPhase] = useState<Phase>('intro');

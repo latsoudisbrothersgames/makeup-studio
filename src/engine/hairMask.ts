@@ -13,9 +13,23 @@ interface HairEntry {
   image: CanvasImageSource;
 }
 
-const registry = new Map<FaceId, HairEntry>();
+const registry = new Map<string, HairEntry>();
+const active = new Map<FaceId, string>();
 
-export function registerHairImage(faceId: FaceId, img: CanvasImageSource): void {
+export const ORIGINAL_STYLE = 'original';
+
+/** Ποιο χτένισμα φοράει τώρα το πρόσωπο (το ορίζει ο compositor του παίκτη σε κάθε απόδοση). */
+export function activateHairStyle(faceId: FaceId, style: string): void {
+  active.set(faceId, style);
+}
+export function activeHairStyle(faceId: FaceId): string {
+  return active.get(faceId) ?? ORIGINAL_STYLE;
+}
+function entry(faceId: FaceId): HairEntry | undefined {
+  return registry.get(`${faceId}:${activeHairStyle(faceId)}`) ?? registry.get(`${faceId}:${ORIGINAL_STYLE}`);
+}
+
+export function registerHairImage(faceId: FaceId, img: CanvasImageSource, style: string = ORIGINAL_STYLE): void {
   const c = makeCanvas(512, 512);
   const ctx = ctx2d(c);
   ctx.drawImage(img, 0, 0);
@@ -31,7 +45,7 @@ export function registerHairImage(faceId: FaceId, img: CanvasImageSource): void 
       n++;
     }
   }
-  registry.set(faceId, {
+  registry.set(`${faceId}:${style}`, {
     alpha,
     centroid: n ? [sx / n, sy / n] : [256, 100],
     outline: silhouetteOutline(c),
@@ -40,20 +54,20 @@ export function registerHairImage(faceId: FaceId, img: CanvasImageSource): void 
 }
 
 export function hasHair(faceId: FaceId): boolean {
-  return registry.has(faceId);
+  return !!entry(faceId);
 }
 
 export function hairImage(faceId: FaceId): CanvasImageSource | undefined {
-  return registry.get(faceId)?.image;
+  return entry(faceId)?.image;
 }
 
 export function hairCentroid(faceId: FaceId): Pt {
-  return registry.get(faceId)?.centroid ?? [256, 100];
+  return entry(faceId)?.centroid ?? [256, 100];
 }
 
 /** Υπάρχουν μαλλιά μέσα σε ακτίνα `tol` γύρω από το σημείο (χώρος 512); */
 export function hairHit(faceId: FaceId, [px, py]: Pt, tol: number): boolean {
-  const e = registry.get(faceId);
+  const e = entry(faceId);
   if (!e) return false;
   const x0 = Math.max(0, Math.floor(px - tol)), x1 = Math.min(511, Math.ceil(px + tol));
   const y0 = Math.max(0, Math.floor(py - tol)), y1 = Math.min(511, Math.ceil(py + tol));
@@ -69,7 +83,7 @@ export function hairHit(faceId: FaceId, [px, py]: Pt, tol: number): boolean {
 
 /** Λευκό περίγραμμα 2px γύρω από τη σιλουέτα των μαλλιών, για το overlay. */
 export function hairOutline(faceId: FaceId): HTMLCanvasElement | undefined {
-  return registry.get(faceId)?.outline;
+  return entry(faceId)?.outline;
 }
 
 function silhouetteOutline(src: HTMLCanvasElement): HTMLCanvasElement {

@@ -33,6 +33,24 @@ export function loadFaceImages(face: Face): Promise<FaceImages> {
           console.warn(err);
         }
       }
+      if (face.styles) {
+        out.styles = {};
+        for (const [id, st] of Object.entries(face.styles)) {
+          const imgs: Partial<FaceImages> = {};
+          for (const e of EXPRESSIONS) {
+            const url = st.images[e] ?? st.images.neutral;
+            if (!url) continue;
+            try { imgs[e] = await loadImage(url); } catch (err) { console.warn(err); }
+          }
+          if (st.hairUrl) {
+            try {
+              imgs.hair = await loadImage(st.hairUrl);
+              registerHairImage(face.id, imgs.hair, id);
+            } catch (err) { console.warn(err); }
+          }
+          out.styles[id] = imgs;
+        }
+      }
       return out;
     })();
     cache.set(face.id, p);

@@ -58,6 +58,8 @@ export interface RegionMap {
   regions: Record<RegionId, Region>;
   /** Παραλλαγές ανά έκφραση — μόνο ό,τι αλλάζει. Κενό `points` = η περιοχή λείπει (π.χ. μάτι κλειστό). */
   variants: Partial<Record<Expression, Partial<Record<RegionId, Region>>>>;
+  /** Παραλλαγές περιοχών ανά χτένισμα (π.χ. άλλη τούφα για το καρέ). */
+  styleRegions?: Partial<Record<string, Partial<Record<RegionId, Region>>>>;
   anchors: {
     lipHighlight: Pt;
     lipHighlightSmile?: Pt;
@@ -93,5 +95,7 @@ export interface Face {
   images: Partial<Record<Expression, string>>;
   /** Ξεχωριστό επίπεδο μαλλιών (RGBA, ίδιο σε όλες τις εκφράσεις)· βλ. tools/hair_layer.py. */
   hairUrl?: string;
+  /** Εναλλακτικά χτενίσματα: βάση ανά έκφραση + επίπεδο μαλλιών (tools/hairstyle_compose.py). */
+  styles?: Record<string, { images: Partial<Record<Expression, string>>; hairUrl?: string }>;
   regions: RegionMap;
 }

@@ -21,7 +21,8 @@ export type CosmeticCategory =
   | 'facePaint'
   | 'lipLiner'
   | 'remover'
-  | 'accessory';
+  | 'accessory'
+  | 'hairstyle';
 
 export type CosmeticGroup = 'face' | 'eyes' | 'lips' | 'hair' | 'fun';
 

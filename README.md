@@ -12,6 +12,7 @@ npm run shots      # στιγμιότυπα desktop/laptop/iPad/iPhone με το
 ```
 
 ## Δομή
+- Χτενίσματα (`src/assets/faces/<id>/styles/<style>/{neutral,blink,smile,wow,hair}.png`): το inpaint θέλει Tier 2 (όχι διαθέσιμο), οπότε `edit_image` (pro, ~40 γεννήσεις, ξανασχεδιάζει όλη την εικόνα) → `tools/hairstyle_compose.py <face> <style> <edited.png> '#χρώματα μαλλιών'` κρατά το ΑΡΧΙΚΟ πρόσωπο pixel-ίδιο, γεμίζει τις τρύπες των παλιών μαλλιών (+ το σκούρο περίγραμμά τους) από τη νέα εικόνα (χρώματα κουμπωμένα στην αρχική παλέτα) και εξάγει το νέο επίπεδο μαλλιών· `styleRegions` στο JSON = τούφα ανά χτένισμα· ο Compositor διαλέγει βάση+μαλλιά από το στρώμα `hairstyle`· `hairMask` ενεργό χτένισμα ανά πρόσωπο (ο στόχος του παιχνιδιού δεν το αλλάζει)· μικρογραφίες panel από τις ίδιες εικόνες (`useHairstyleThumbs`)
 - Αστέρια & ξεκλειδώματα: `storage/players.ts` (αστέρια ανά όνομα, `makeupStudio:players:v1`), `data/unlocks.ts` (3★ τιάρα, 6★ μωβ/τιρκουάζ μαλλιά, 10★ πεταλούδα/πετράδι, 15★ ουράνιο τόξο), `components/StarBoard` στην αρχική· κλειδωμένα = 🔒 στο panel, δεν σέρνονται, δεν μπαίνουν σε στόχους
 - Δύο παίκτες (μέσα στο παιχνίδι): ονόματα → παράδοση → ο ένας φτιάχνει στυλ (60΄΄, N πράγματα, «Έτοιμο») → παράδοση → ο άλλος αντιγράφει → αλλαγή ρόλων → τελικό· ο στόχος κρύβεται στη δημιουργία/παράδοση· χωρίς κλειδώματα στους δύο παίκτες
 - Αξεσουάρ μαλλιών (`src/data/accessories.ts`, sprites `src/assets/accessories/ac_{clip,bow,band,tiara}.png` 4 γεννήσεις PixelLab, χρώμα με αντικατάσταση παλέτας): 3 θέσεις = περιοχές `accL/accR/accTop` (κύκλοι r=30 γύρω από τις άγκυρες), singleton ανά θέση, στέκα/τιάρα μόνο κορυφή, σχεδιάζονται ΠΑΝΩ από τα μαλλιά (`Pass.aboveHair`)· αυτοκόλλητο πάνω σε θέση με στολίδι → διακοσμητικό του (`deco`)· τα sprites είναι και εικονίδια στο μενού
@@ -27,6 +28,7 @@ npm run shots      # στιγμιότυπα desktop/laptop/iPad/iPhone με το
 - `tools/pl.py`, `tools/face_variants.py`, `tools/face_grid.py` — PixelLab pipeline· `#/dev/regions?face=f1` — επεξεργαστής περιοχών (πολύγωνα + άγκυρες)
 - `node tools/hairshot.mjs [--ui]` — στιγμιότυπα βαφής+τούφας στα 4 πρόσωπα και του panel «Μαλλιά» (iPhone/desktop)
 - `node tools/accshot.mjs` — αξεσουάρ+διακοσμητικά σε 4 πρόσωπα (με πραγματικό drop αυτοκόλλητου στη θέση) και panel «Στολίδια» iPhone
+- `node tools/styleshot.mjs` — καρέ στην Ελένη με βαφή/τούφα/μάσκα/αξεσουάρ σε 4 εκφράσεις + panel Χτένισμα
 - `node tools/duoshot.mjs` — αστέρια/ξεκλειδώματα (0★ 🔒, νίκη → +3★ + τιάρα, πίνακας) και πλήρης ροή δύο παικτών (iPhone)
 - `node tools/gameshot.mjs` — ροή παιχνιδιού (επίπεδο 2, μερική πρόοδος, νίκη) σε desktop+iPhone· `node tools/dragtest.mjs` — ακρίβεια drop αυτοκόλλητου σε 3 σημεία
 - `node tools/paintshot.mjs`, `node tools/step3shot.mjs` — στιγμιότυπα μπογιών/μολυβιού και καρτών/φωτογραφίας (iPhone+desktop, με έλεγχο λήψης PNG)

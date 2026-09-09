@@ -5,11 +5,14 @@ import { featheredMask, type MaskBitmap } from './masks';
 import { RECIPES, type Pass, type RecipeEnv } from './recipes';
 import { getPoints } from './regions';
 import { composeHair } from './hairColor';
+import { activateHairStyle, ORIGINAL_STYLE } from './hairMask';
 
 export type SpriteMap = Record<string, HTMLImageElement>;
 export type FaceImages = Record<Expression, CanvasImageSource> & {
   /** Επίπεδο μαλλιών: σχεδιάζεται ΠΑΝΩ από όλο το μακιγιάζ ώστε οι τούφες να καλύπτουν μάσκα, μπογιές κ.λπ. */
   hair?: CanvasImageSource;
+  /** Εναλλακτικά χτενίσματα: βάση ανά έκφραση (χωρίς τα παλιά μαλλιά) + το δικό τους επίπεδο μαλλιών. */
+  styles?: Record<string, Partial<Record<Expression, CanvasImageSource>> & { hair?: CanvasImageSource }>;
 };
 
 /** Σειρά σχεδίασης: zRank, μετά σειρά εφαρμογής. */
@@ -37,11 +40,28 @@ export class Compositor {
   private readonly catalogue: Record<CosmeticCategory, Cosmetic>;
   private readonly sprites: SpriteMap;
 
-  constructor(face: Face, images: FaceImages, catalogue: Record<CosmeticCategory, Cosmetic>, sprites: SpriteMap = {}) {
+  /** false για τον compositor του «στόχου» στο παιχνίδι: δεν αλλάζει το ενεργό χτένισμα του hit-test. */
+  private readonly trackStyle: boolean;
+
+  constructor(face: Face, images: FaceImages, catalogue: Record<CosmeticCategory, Cosmetic>, sprites: SpriteMap = {}, trackStyle = true) {
     this.face = face;
     this.images = images;
     this.catalogue = catalogue;
     this.sprites = sprites;
+    this.trackStyle = trackStyle;
+  }
+
+  /** Το χτένισμα από το τελευταίο στρώμα 'hairstyle' (αν υπάρχουν εικόνες του), αλλιώς το αρχικό. */
+  styleOf(layers: AppliedLayer[]): string {
+    let st = ORIGINAL_STYLE;
+    for (const l of layers) if (l.category === 'hairstyle' && l.variant) st = l.variant;
+    return st !== ORIGINAL_STYLE && this.images.styles?.[st] ? st : ORIGINAL_STYLE;
+  }
+
+  /** Σημεία περιοχής με παραλλαγή χτενίσματος (π.χ. τούφα του καρέ). */
+  private stylePoints(expr: Expression, id: RegionId, style: string) {
+    const o = style !== ORIGINAL_STYLE ? this.face.regions.styleRegions?.[style]?.[id] : undefined;
+    return o ? o.points : getPoints(this.face, expr, id);
   }
 
   private env(expr: Expression): RecipeEnv {
@@ -88,6 +108,8 @@ export class Compositor {
 
   /** Αποδίδει στο `out`. `pulse` = πολλαπλασιαστής alpha για τα περάσματα με pulse (ρουζ). */
   render(expr: Expression, layers: AppliedLayer[], pulse = 1): HTMLCanvasElement {
+    const style = this.styleOf(layers);
+    if (this.trackStyle) activateHairStyle(this.face.id, style);
     const key = layers.map((l) => l.id).join(',');
     if (key !== this.frameKey) {
       this.frameCache.clear();
@@ -103,7 +125,8 @@ export class Compositor {
       return this.out;
     }
     ctx.clearRect(0, 0, 512, 512);
-    ctx.drawImage(this.images[expr], 0, 0);
+    const base = (style !== ORIGINAL_STYLE && this.images.styles?.[style]?.[expr]) || this.images[expr];
+    ctx.drawImage(base, 0, 0);
     const aboveHair: Pass[] = [];
     for (const layer of this.sorted(layers)) {
       for (const p of this.passesFor(layer, expr)) {
@@ -115,7 +138,7 @@ export class Compositor {
     }
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
-    const hair = this.hairImage(layers);
+    const hair = this.hairImage(layers, style);
     if (hair) ctx.drawImage(hair, 0, 0);
     for (const p of aboveHair) {
       ctx.globalCompositeOperation = p.blend;
@@ -133,8 +156,8 @@ export class Compositor {
   }
 
   /** Το επίπεδο μαλλιών όπως θα σχεδιαστεί: αρχικό ή βαμμένο (χρώμα + τούφα), με cache ανά συνδυασμό. */
-  private hairImage(layers: AppliedLayer[]): CanvasImageSource | undefined {
-    const src = this.images.hair;
+  private hairImage(layers: AppliedLayer[], style: string): CanvasImageSource | undefined {
+    const src = (style !== ORIGINAL_STYLE ? this.images.styles?.[style]?.hair : undefined) ?? this.images.hair;
     if (!src) return undefined;
     let base: string | null = null, streak: string | null = null;
     for (const l of layers) {
@@ -142,10 +165,10 @@ export class Compositor {
       else if (l.category === 'hairStreak') streak = l.color;
     }
     if (!base && !streak) return src;
-    const key = `${base ?? ''}|${streak ?? ''}`;
+    const key = `${style}|${base ?? ''}|${streak ?? ''}`;
     let out = this.hairCache.get(key);
     if (!out) {
-      out = composeHair(src, base, streak, getPoints(this.face, 'neutral', 'hairStreak'));
+      out = composeHair(src, base, streak, this.stylePoints('neutral', 'hairStreak', style));
       if (this.hairCache.size > 24) this.hairCache.clear();
       this.hairCache.set(key, out);
     }

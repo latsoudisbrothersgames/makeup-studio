@@ -76,6 +76,8 @@ def main(argv):
         for k, v in list(arguments.items()):
             if isinstance(v, str) and v.startswith('@file:'):
                 arguments[k] = data_url(v[6:])
+            elif isinstance(v, list):
+                arguments[k] = [data_url(x[6:]) if isinstance(x, str) and x.startswith('@file:') else x for x in v]
         print(mcp_call(argv[2], arguments))
     elif cmd == 'wait':
         wait(argv[2], argv[3], int(argv[4]) if len(argv) > 4 else 0)
