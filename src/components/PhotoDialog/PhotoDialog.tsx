@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { S } from '../../data/strings';
 import { PHOTO_BGS, sharePhoto, type PhotoBg, type ShareResult } from '../../engine/exportImage';
 import { Button } from '../Button/Button';
@@ -20,12 +20,11 @@ export function PhotoDialog({ render, filename, onDone, onClose }: Props) {
   const [bg, setBg] = useState<PhotoBg>('plain');
   const [busy, setBusy] = useState(false);
   const canvas = useMemo(() => render(bg), [render, bg]);
-  const [preview, setPreview] = useState('');
-  useEffect(() => {
+  const preview = useMemo(() => {
     try {
-      setPreview(canvas.toDataURL('image/png'));
+      return canvas.toDataURL('image/png');
     } catch {
-      setPreview('');
+      return '';
     }
   }, [canvas]);
 
