@@ -60,11 +60,6 @@
   transition: background var(--transition-fast);
 }
 
-.hintbar__card { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.hintbar__goal { color: var(--text-600); }
-.hintbar__goal.is-done { color: var(--mint-600); }
-.hintbar__sep { margin-right: 8px; color: var(--text-400); }
-
 .hintbar--good { background: #e8fff3; color: var(--mint-600); }
 .hintbar--bad { background: #fff0f0; color: var(--coral-600); }
 

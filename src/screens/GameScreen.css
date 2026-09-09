@@ -1,0 +1,133 @@
+/* ─── Παιχνίδι «Αντίγραψε το στυλ» ───────────────────────────────── */
+.game {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 28vw, 440px);
+  grid-template-areas:
+    'bar bar'
+    'hint hint'
+    'stages panel';
+  gap: 12px;
+  height: 100%;
+}
+
+.game__bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.game__hint { grid-area: hint; }
+
+.game__timer,
+.game__score {
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--plum-900);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.game__timer { font-variant-numeric: tabular-nums; min-width: 6.5em; text-align: center; }
+.game__timer.is-low { background: #fff0f0; color: var(--coral-600); animation: timer-pulse 1s ease-in-out infinite; }
+.game__score { margin-left: auto; }
+
+@keyframes timer-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.game__stages {
+  grid-area: stages;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+}
+
+.game__stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+}
+
+.game__label {
+  text-align: center;
+  font-weight: 700;
+  color: var(--pink-600);
+  font-size: var(--fs-md);
+  padding-bottom: 4px;
+}
+
+.game__stage--you .game__label { color: var(--mint-600); }
+
+.game__panel { grid-area: panel; min-height: 0; min-width: 0; display: flex; }
+.game__panel > * { flex: 1; }
+
+/* Επίπεδα (διάλογος έναρξης) */
+.game__levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.game__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 3px solid var(--pink-100);
+  color: var(--plum-900);
+  min-height: var(--tap);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.game__level:hover, .game__level:focus-visible { border-color: var(--pink-500); transform: translateY(-2px); }
+.game__level-emoji { font-size: 2rem; line-height: 1; }
+.game__level-name { font-weight: 700; font-size: var(--fs-lg); }
+.game__level-meta { font-size: var(--fs-sm); color: var(--text-600); }
+
+.game__stars {
+  text-align: center;
+  font-size: 3rem;
+  line-height: 1;
+  color: #f5b301;
+  text-shadow: 0 2px 0 #fff;
+  margin-bottom: 8px;
+}
+
+/* Κατακόρυφες / στενές οθόνες: δύο πρόσωπα δίπλα-δίπλα, panel από κάτω */
+@media (max-width: 900px), (orientation: portrait) {
+  .game {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'bar'
+      'hint'
+      'stages'
+      'panel';
+    gap: 8px;
+  }
+  .game__bar { gap: 6px; flex-wrap: nowrap; }
+  .game__score { margin-left: 0; }
+  .game__bar .btn { padding: 0.3em 0.7em; min-height: 40px; font-size: 0.8rem; }
+  .game__timer, .game__score { font-size: 0.95rem; padding: 4px 10px; }
+  .game__timer { min-width: 5.5em; }
+  .game__stages { gap: 8px; height: min(50vw, 40dvh); }
+  .game__label { font-size: 0.85rem; padding-bottom: 2px; }
+  .game__panel { max-height: none; }
+  .game__levels { grid-template-columns: 1fr; }
+  .game__level { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 10px 14px; }
+  .game__level-name { flex: 1; text-align: left; }
+}

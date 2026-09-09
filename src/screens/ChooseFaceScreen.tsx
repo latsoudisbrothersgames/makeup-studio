@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { playSound } from '../audio/soundManager';
 import { Button } from '../components/Button/Button';
 import { FACES } from '../data/faces';
@@ -32,6 +32,8 @@ function FacePortrait({ face }: { face: Face }) {
 export function ChooseFaceScreen() {
   const nav = useNavigate();
   const session = useSession();
+  const [params] = useSearchParams();
+  const gameMode = params.get('mode') === 'game';
   const [faceId, setFaceId] = useState<FaceId>(session.faceId ?? 'f1');
   const [name, setName] = useState(session.modelName);
 
@@ -39,7 +41,7 @@ export function ChooseFaceScreen() {
     session.setFace(faceId);
     session.setModelName(sanitizeName(name));
     session.setProjectId(null);
-    nav('/studio?new=1');
+    nav(gameMode ? '/game' : '/studio?new=1');
   };
 
   return (

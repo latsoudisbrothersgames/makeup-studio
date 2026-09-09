@@ -7,23 +7,20 @@ import { ConfirmDialog } from '../components/Dialog/Dialog';
 import { DragGhost } from '../components/DragGhost/DragGhost';
 import { FaceStage, type FaceStageHandle } from '../components/FaceStage/FaceStage';
 import { SaveDialog } from '../components/SaveDialog/SaveDialog';
-import { CardsDialog } from '../components/CardsDialog/CardsDialog';
 import { PhotoDialog } from '../components/PhotoDialog/PhotoDialog';
-import { cardById } from '../data/cards';
 import { renderPhoto, type PhotoBg, type ShareResult } from '../engine/exportImage';
 import { makeCanvas, ctx2d } from '../engine/canvas';
 import { Toast } from '../components/Toast/Toast';
 import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
 import { S } from '../data/strings';
-import { stickerUrls } from '../assets';
+import { loadSprites } from '../assets/sprites';
 import { FaceAnimator, type Particle } from '../engine/animator';
-import { loadImage } from '../engine/canvas';
 import { Compositor, type SpriteMap } from '../engine/compositor';
+import { layerAt } from '../engine/layerAt';
 import { centroid } from '../engine/geometry';
 import type { DropResolution } from '../engine/hitTest';
-import { hairCentroid, hairHit } from '../engine/hairMask';
-import { distToPolyline, pointInPolygon } from '../engine/geometry';
+import { hairCentroid } from '../engine/hairMask';
 import { getRegion } from '../engine/regions';
 import { makeThumbnail } from '../engine/thumbnail';
 import { installTestHook, testHooksEnabled } from '../dev/testHook';
@@ -37,22 +34,8 @@ import { REGION_IDS, type Expression, type Pt, type RegionId } from '../types/fa
 import type { Project } from '../types/project';
 import '../styles/layout.css';
 
-type DialogKind = 'none' | 'confirmClear' | 'save' | 'leave' | 'cards' | 'photo';
+type DialogKind = 'none' | 'confirmClear' | 'save' | 'leave' | 'photo';
 type HintMood = 'idle' | 'good' | 'bad';
-
-let spriteCache: Promise<SpriteMap> | null = null;
-function loadSprites(): Promise<SpriteMap> {
-  if (!spriteCache) {
-    spriteCache = (async () => {
-      const out: SpriteMap = {};
-      for (const [name, url] of Object.entries(stickerUrls())) {
-        try { out[name] = await loadImage(url); } catch { /* παραλείπεται */ }
-      }
-      return out;
-    })();
-  }
-  return spriteCache;
-}
 
 export function StudioScreen() {
   const nav = useNavigate();
@@ -91,8 +74,6 @@ export function StudioScreen() {
   const particlesRef = useRef<Particle[]>([]);
   const [hint, setHint] = useState<{ text: string; mood: HintMood }>({ text: S.hintIdle, mood: 'idle' });
   const [dialog, setDialog] = useState<DialogKind>('none');
-  const [cardId, setCardId] = useState<string | null>(null);
-  const celebrated = useRef<Set<string>>(new Set());
   const [pendingNav, setPendingNav] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [sel, setSel] = useState<PanelSelection>(() => defaultSelection('lipstick', face ?? faceById('f1')!));
@@ -181,30 +162,9 @@ export function StudioScreen() {
     stageRef.current?.bounce();
   }, [animator, compositor]);
 
-  /** Βαμβάκι: ποιο στρώμα καλύπτει το σημείο; Το πιο ΠΡΟΣΦΑΤΑ εφαρμοσμένο κερδίζει (όχι το πιο πάνω στο z). */
-  const layerAt = useCallback((pt: Pt): AppliedLayer | undefined => {
-    if (!face) return undefined;
-    const expr = exprRef.current;
-    const covers = (l: AppliedLayer): boolean => {
-      if (l.category === 'remover') return false;
-      if (l.category === 'hairColor') return hairHit(face.id, pt, 6);
-      if (l.category === 'hairStreak') return hairHit(face.id, pt, 6) && pointInPolygon(pt, getRegion(face.regions, 'neutral', 'hairStreak').points);
-      if (l.at) return Math.hypot(l.at[0] - pt[0], l.at[1] - pt[1]) <= 28;
-      for (const id of l.regionIds) {
-        const r = getRegion(face.regions, expr, id);
-        if (r.points.length < 2) continue;
-        if (r.kind === 'polyline' ? distToPolyline(pt, r.points) <= 14 : pointInPolygon(pt, r.points)) return true;
-      }
-      return false;
-    };
-    const ls = layersRef.current;
-    for (let i = ls.length - 1; i >= 0; i--) if (covers(ls[i])) return ls[i];
-    return undefined;
-  }, [face]);
-
   const onDrop = useCallback((p: DragPayload, res: Extract<DropResolution, { ok: true }>) => {
     if (p.cosmetic.category === 'remover') {
-      const target = layerAt(res.anchor);
+      const target = face ? layerAt(face, exprRef.current, layersRef.current, res.anchor) : undefined;
       if (target) {
         dispatch({ type: 'remove', id: target.id });
         playSound('clear');
@@ -229,7 +189,7 @@ export function StudioScreen() {
     applyLayer(layer, res.anchor);
     setHint({ text: S.hintDone, mood: 'good' });
     window.setTimeout(() => setHint((h) => (h.text === S.hintDone ? { text: S.hintIdle, mood: 'idle' } : h)), 1400);
-  }, [applyLayer, layerAt]);
+  }, [applyLayer, face]);
 
   const drag = useDragCosmetic({
     face: face ?? faceById('f1')!,
@@ -250,19 +210,6 @@ export function StudioScreen() {
       setHint((h) => (h.mood === 'good' ? h : { text: S.hintIdle, mood: 'idle' }));
     },
   });
-
-  // ── Κάρτες έμπνευσης: πανηγυρισμός όταν ολοκληρωθούν και τα 2 αιτήματα ──
-  const card = cardById(cardId);
-  useEffect(() => {
-    if (!card) return;
-    const all = card.goals.every((g) => g.done(state.layers));
-    if (all && !celebrated.current.has(card.id)) {
-      celebrated.current.add(card.id);
-      playSound('save');
-      animator.trigger('wow', [256, 240]);
-      setToast(S.cardDone);
-    }
-  }, [card, state.layers, animator]);
 
   // ── Φωτογραφία ────────────────────────────────────────────────────
   const renderPhotoFor = useCallback((bg: PhotoBg): HTMLCanvasElement => {
@@ -359,7 +306,7 @@ export function StudioScreen() {
           at = undefined;
         } else if (c.target.kind === 'any') {
           at = opts?.at ?? centroid(getRegion(face.regions, 'neutral', 'cheekL').points);
-          const target = layerAt(at);
+          const target = layerAt(face, exprRef.current, layersRef.current, at);
           if (target) dispatch({ type: 'remove', id: target.id });
           return;
         } else {
@@ -390,7 +337,7 @@ export function StudioScreen() {
     };
     installTestHook(api);
     return () => installTestHook(null);
-  }, [face, compositor, animator, applyLayer, persist, layerAt]);
+  }, [face, compositor, animator, applyLayer, persist]);
 
   if (!face) return null;
 
@@ -411,23 +358,10 @@ export function StudioScreen() {
           onGallery={() => guardedNav('/gallery')}
           onChangeFace={() => guardedNav('/choose')}
           onPhoto={() => setDialog('photo')}
-          onIdeas={() => setDialog('cards')}
-          ideasActive={!!card}
+          onGame={() => guardedNav('/game')}
         />
       </div>
-      <div className={`hintbar studio__hint hintbar--${hint.mood}`} aria-live="polite">
-        {card && hint.mood === 'idle' ? (
-          <span className="hintbar__card" data-card-progress>
-            <span aria-hidden="true">{card.emoji}</span>
-            {card.goals.map((g, i) => (
-              <span key={g.id} className={`hintbar__goal ${g.done(state.layers) ? 'is-done' : ''}`}>
-                {i > 0 && <span className="hintbar__sep" aria-hidden="true">·</span>}
-                <span aria-hidden="true">{g.done(state.layers) ? '✓' : '○'}</span> {g.labelEl}
-              </span>
-            ))}
-          </span>
-        ) : hint.text}
-      </div>
+      <div className={`hintbar studio__hint hintbar--${hint.mood}`} aria-live="polite">{hint.text}</div>
       <div className="studio__stage">
         <FaceStage face={face} compositor={compositor} ref={stageRef} />
       </div>
@@ -460,9 +394,6 @@ export function StudioScreen() {
           onSave={(p, m) => { if (persist(p, m)) setDialog('none'); }}
           onCancel={() => setDialog('none')}
         />
-      )}
-      {dialog === 'cards' && (
-        <CardsDialog activeId={cardId} layers={state.layers} onPick={setCardId} onClose={() => setDialog('none')} />
       )}
       {dialog === 'photo' && (
         <PhotoDialog

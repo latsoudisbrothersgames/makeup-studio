@@ -13,9 +13,7 @@ interface Props {
   onGallery(): void;
   onChangeFace(): void;
   onPhoto(): void;
-  onIdeas(): void;
-  /** Έχει επιλεγεί κάρτα έμπνευσης; (τονίζει το κουμπί) */
-  ideasActive?: boolean;
+  onGame(): void;
 }
 
 export function ActionBar(p: Props) {
@@ -36,7 +34,7 @@ export function ActionBar(p: Props) {
         <Button variant="ghost" icon="🧼" onClick={p.onClear} disabled={!p.canClear} data-action="clear">{S.clear}</Button>
         <Button variant="mint" icon="💾" onClick={p.onSave} data-action="save">{S.save}</Button>
         <Button variant="primary" icon="📸" onClick={p.onPhoto} data-action="photo">{S.photo}</Button>
-        <Button variant={p.ideasActive ? 'sun' : 'ghost'} icon="💡" onClick={p.onIdeas} data-action="ideas">{S.ideas}</Button>
+        <Button variant="sun" icon="🏆" onClick={p.onGame} data-action="game">{S.game}</Button>
       </div>
     </header>
   );
