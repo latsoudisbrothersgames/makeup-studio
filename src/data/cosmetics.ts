@@ -1,5 +1,6 @@
 import type { Cosmetic, CosmeticCategory, CosmeticGroup } from '../types/cosmetic';
 import { S } from './strings';
+import { HAIR_PALETTE } from '../engine/hairColor';
 
 /**
  * Κατάλογος καλλυντικών. Το `palette` της βάσης/κονσίλερ γεμίζει από τις αποχρώσεις του
@@ -73,6 +74,14 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
     palette: ['#ff5c8a', '#ffd54f', '#4fc3f7', '#ff8a65', '#ba68c8'],
     variants: ['heart', 'star', 'gem', 'flower', 'butterfly'], anim: 'smile', zRank: 13, singleton: false,
   },
+  hairColor: {
+    category: 'hairColor', group: 'hair', labelEl: 'Χρώμα', hintEl: 'Άφησε τη βαφή πάνω στα μαλλιά', emoji: '🖌️',
+    target: { kind: 'hair' }, palette: HAIR_PALETTE, anim: 'wow', zRank: 20, singleton: true,
+  },
+  hairStreak: {
+    category: 'hairStreak', group: 'hair', labelEl: 'Τούφα', hintEl: 'Άφησε το χρώμα πάνω στην τούφα, στα αριστερά', emoji: '🌈',
+    target: { kind: 'regions', regions: ['hairStreak'], mirror: false }, palette: HAIR_PALETTE, anim: 'smile', zRank: 21, singleton: true,
+  },
   mask: {
     category: 'mask', group: 'face', labelEl: 'Μάσκα προσώπου', hintEl: 'Άφησε τη μάσκα πάνω στο πρόσωπο', emoji: '🎭',
     target: { kind: 'face' },
@@ -84,6 +93,7 @@ export const GROUPS: { id: CosmeticGroup; labelEl: string; emoji: string }[] = [
   { id: 'face', labelEl: S.groupFace, emoji: '🙂' },
   { id: 'eyes', labelEl: S.groupEyes, emoji: '👁️' },
   { id: 'lips', labelEl: S.groupLips, emoji: '👄' },
+  { id: 'hair', labelEl: S.groupHair, emoji: '💇' },
   { id: 'fun', labelEl: S.groupFun, emoji: '🎉' },
 ];
 
@@ -91,6 +101,7 @@ export const CATEGORY_ORDER: CosmeticCategory[] = [
   'foundation', 'concealer', 'blush', 'highlighter', 'freckles', 'beautySpot', 'mask',
   'eyeshadow', 'eyeliner', 'mascara', 'brow',
   'lipstick', 'gloss',
+  'hairColor', 'hairStreak',
   'glitter', 'sticker',
 ];
 

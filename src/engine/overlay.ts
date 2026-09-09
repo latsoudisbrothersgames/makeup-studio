@@ -2,6 +2,7 @@ import type { Expression, Face, RegionId } from '../types/face';
 import type { Particle } from './animator';
 import { polyPath, polylinePath } from './geometry';
 import { getRegion } from './regions';
+import { hairOutline } from './hairMask';
 
 export interface OverlayState {
   /** Περιοχές-υποψήφιες (διακεκομμένο περίγραμμα). */
@@ -21,8 +22,13 @@ export function drawOverlay(ctx: CanvasRenderingContext2D, face: Face, expr: Exp
   };
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
+  const hair = hairOutline(face.id);
   for (const id of s.hints) {
     if (s.glow.includes(id)) continue;
+    if (id === 'hair') {
+      if (hair) { ctx.globalAlpha = 0.85; ctx.drawImage(hair, 0, 0); ctx.globalAlpha = 1; }
+      continue;
+    }
     const p = pathOf(id);
     if (!p) continue;
     ctx.setLineDash([6, 5]);
@@ -35,6 +41,16 @@ export function drawOverlay(ctx: CanvasRenderingContext2D, face: Face, expr: Exp
     ctx.stroke(p);
   }
   for (const id of s.glow) {
+    if (id === 'hair') {
+      if (hair) {
+        ctx.save();
+        ctx.shadowColor = '#fff2a8';
+        ctx.shadowBlur = 14;
+        ctx.drawImage(hair, 0, 0);
+        ctx.restore();
+      }
+      continue;
+    }
     const p = pathOf(id);
     if (!p) continue;
     ctx.save();

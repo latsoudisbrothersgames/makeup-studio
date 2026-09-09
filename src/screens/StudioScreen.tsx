@@ -17,6 +17,7 @@ import { loadImage } from '../engine/canvas';
 import { Compositor, type SpriteMap } from '../engine/compositor';
 import { centroid } from '../engine/geometry';
 import type { DropResolution } from '../engine/hitTest';
+import { hairCentroid } from '../engine/hairMask';
 import { getRegion } from '../engine/regions';
 import { makeThumbnail } from '../engine/thumbnail';
 import { installTestHook, testHooksEnabled } from '../dev/testHook';
@@ -277,13 +278,16 @@ export function StudioScreen() {
           if (category === 'eyeliner' || category === 'mascara') regionIds = ['lashL', 'lashR'];
         } else if (c.target.kind === 'face') {
           regionIds = ['skin'];
+        } else if (c.target.kind === 'hair') {
+          regionIds = ['hair'];
+          at = undefined;
         } else {
           at = opts?.at ?? centroid(getRegion(face.regions, 'neutral', 'cheekL').points);
         }
         const layer: AppliedLayer = {
           id: newLayerId(), category, color, variant: opts?.variant ?? c.variants?.[0], regionIds, at, seed: 12345,
         };
-        applyLayer(layer, at ?? centroid(getRegion(face.regions, 'neutral', regionIds[0] ?? 'skin').points));
+        applyLayer(layer, at ?? (c.target.kind === 'hair' ? hairCentroid(face.id) : centroid(getRegion(face.regions, 'neutral', regionIds[0] ?? 'skin').points)));
       },
       setExpression: (e: Expression | null) => animator.setExpression(e),
       freeze: (on: boolean) => animator.freeze(on),

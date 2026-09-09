@@ -424,6 +424,9 @@ const beautySpot: Recipe = (layer, _c, env) => {
 
 export const RECIPES: Record<Cosmetic['category'], Recipe> = {
   foundation, concealer, blush, highlighter, eyeshadow, eyeliner, mascara, brow, lipstick, gloss, mask, glitter, sticker, freckles, beautySpot,
+  // Τα μαλλιά δεν είναι πέρασμα: συντίθενται στο Compositor.hairImage (βλ. hairColor.ts).
+  hairColor: () => [],
+  hairStreak: () => [],
 };
 
 export { featheredMask, clipMask, tracePoly };

@@ -4,6 +4,7 @@ import { makeCanvas, ctx2d } from './canvas';
 import { featheredMask, type MaskBitmap } from './masks';
 import { RECIPES, type Pass, type RecipeEnv } from './recipes';
 import { getPoints } from './regions';
+import { composeHair } from './hairColor';
 
 export type SpriteMap = Record<string, HTMLImageElement>;
 export type FaceImages = Record<Expression, CanvasImageSource> & {
@@ -21,6 +22,7 @@ export class Compositor {
   private readonly maskCache = new Map<string, MaskBitmap>();
   private readonly passCache = new Map<string, Pass[]>();
   private readonly frameCache = new Map<Expression, HTMLCanvasElement>();
+  private readonly hairCache = new Map<string, CanvasImageSource>();
   private frameKey = '';
   readonly face: Face;
   private readonly images: FaceImages;
@@ -106,7 +108,7 @@ export class Compositor {
     }
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
-    const hair = this.hairImage();
+    const hair = this.hairImage(layers);
     if (hair) ctx.drawImage(hair, 0, 0);
     if (pulse === 1) {
       const snap = makeCanvas(512, 512);
@@ -116,9 +118,24 @@ export class Compositor {
     return this.out;
   }
 
-  /** Το επίπεδο μαλλιών όπως θα σχεδιαστεί (βήμα 2: εδώ μπαίνει η αλλαγή χρώματος). */
-  protected hairImage(): CanvasImageSource | undefined {
-    return this.images.hair;
+  /** Το επίπεδο μαλλιών όπως θα σχεδιαστεί: αρχικό ή βαμμένο (χρώμα + τούφα), με cache ανά συνδυασμό. */
+  private hairImage(layers: AppliedLayer[]): CanvasImageSource | undefined {
+    const src = this.images.hair;
+    if (!src) return undefined;
+    let base: string | null = null, streak: string | null = null;
+    for (const l of layers) {
+      if (l.category === 'hairColor') base = l.color;
+      else if (l.category === 'hairStreak') streak = l.color;
+    }
+    if (!base && !streak) return src;
+    const key = `${base ?? ''}|${streak ?? ''}`;
+    let out = this.hairCache.get(key);
+    if (!out) {
+      out = composeHair(src, base, streak, getPoints(this.face, 'neutral', 'hairStreak'));
+      if (this.hairCache.size > 24) this.hairCache.clear();
+      this.hairCache.set(key, out);
+    }
+    return out;
   }
 
   /** Προθέρμανση των περασμάτων ενός στρώματος για τις άλλες εκφράσεις (σε idle χρόνο). */

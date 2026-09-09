@@ -15,9 +15,11 @@ export type CosmeticCategory =
   | 'glitter'
   | 'sticker'
   | 'freckles'
-  | 'beautySpot';
+  | 'beautySpot'
+  | 'hairColor'
+  | 'hairStreak';
 
-export type CosmeticGroup = 'face' | 'eyes' | 'lips' | 'fun';
+export type CosmeticGroup = 'face' | 'eyes' | 'lips' | 'hair' | 'fun';
 
 export type DropTarget =
   /** Κουμπώνει σε μία από αυτές τις περιοχές (+ η καθρεφτισμένη της αν mirror). */
@@ -25,7 +27,9 @@ export type DropTarget =
   /** Οπουδήποτε πάνω στο δέρμα → όλο το πρόσωπο. */
   | { kind: 'face' }
   /** Οπουδήποτε πάνω στο δέρμα → ακριβώς εκεί. */
-  | { kind: 'free' };
+  | { kind: 'free' }
+  /** Οπουδήποτε πάνω στα pixel των μαλλιών (hair.png) → όλα τα μαλλιά. */
+  | { kind: 'hair' };
 
 export type AnimTrigger = 'smile' | 'wow' | 'blushPulse' | 'none';
 

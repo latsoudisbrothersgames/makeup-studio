@@ -32,7 +32,8 @@ export const S = {
   groupFace: 'Πρόσωπο',
   groupEyes: 'Μάτια',
   groupLips: 'Χείλη',
-  groupFun: 'Διακόσμηση',
+  groupHair: 'Μαλλιά',
+  groupFun: 'Έξτρα',
 
   confirmClearTitle: 'Να καθαρίσω όλο το μακιγιάζ;',
   confirmClearBody: 'Το πρόσωπο θα γίνει όπως ήταν στην αρχή.',

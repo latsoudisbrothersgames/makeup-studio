@@ -15,11 +15,13 @@
 /* Ομάδες */
 .panel__groups {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .panel__group {
+  min-width: 0;
+  white-space: nowrap;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,7 +32,7 @@
   background: var(--lilac-100);
   color: var(--plum-700);
   font-weight: 700;
-  font-size: var(--fs-sm);
+  font-size: clamp(11px, 2.6vw, var(--fs-sm));
   border: 3px solid transparent;
   transition: transform var(--transition-fast), background var(--transition-fast);
 }

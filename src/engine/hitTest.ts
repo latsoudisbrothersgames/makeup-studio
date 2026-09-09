@@ -2,6 +2,7 @@ import type { Cosmetic } from '../types/cosmetic';
 import type { Expression, Face, Pt, RegionId } from '../types/face';
 import { centroid, distToPolyline, MIRROR, pointInPolygon, polyBBox } from './geometry';
 import { getRegion } from './regions';
+import { hairCentroid, hairHit } from './hairMask';
 
 export type DropResolution =
   | { ok: true; regionIds: RegionId[]; anchor: Pt }
@@ -26,6 +27,7 @@ export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmeti
   const t = cosmetic.target;
   if (t.kind === 'regions') return t.regions.filter((id) => getRegion(face.regions, expr, id).points.length >= 2);
   if (t.kind === 'face') return ['faceBox'];
+  if (t.kind === 'hair') return ['hair'];
   return ['skin'];
 }
 
@@ -49,6 +51,10 @@ export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p:
     if (!hitsRegion(face, expr, 'skin', p, 30)) return { ok: false };
     const [ax, ay] = centroid(getRegion(face.regions, expr, 'skin').points);
     return { ok: true, regionIds: ['skin'], anchor: [ax, ay] };
+  }
+  if (t.kind === 'hair') {
+    if (!hairHit(face.id, p, 22)) return { ok: false };
+    return { ok: true, regionIds: ['hair'], anchor: hairCentroid(face.id) };
   }
   if (!pointInPolygon(p, getRegion(face.regions, expr, 'skin').points)) return { ok: false };
   return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };

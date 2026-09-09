@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { loadImage } from '../engine/canvas';
 import { drawPlaceholderFace } from '../engine/placeholderFace';
+import { registerHairImage } from '../engine/hairMask';
 import type { FaceImages } from '../engine/compositor';
 import { EXPRESSIONS, type Face } from '../types/face';
 
@@ -27,6 +28,7 @@ export function loadFaceImages(face: Face): Promise<FaceImages> {
       if (face.hairUrl) {
         try {
           out.hair = await loadImage(face.hairUrl);
+          registerHairImage(face.id, out.hair);
         } catch (err) {
           console.warn(err);
         }
