@@ -18,7 +18,7 @@ for (const [f, items] of Object.entries(combos)) {
   await p.waitForTimeout(300);
   await p.evaluate((items) => {
     const s = window.__studio; s.freeze(true);
-    for (const [v, slot, color, deco] of items) s.apply('accessory', color, { variant: v, regionId: slot });
+    for (const [v, slot, color] of items) s.apply('accessory', color, { variant: v, regionId: slot });
     s.apply('hairColor', '#9a5ed8');
   }, items);
   await p.waitForTimeout(300);
