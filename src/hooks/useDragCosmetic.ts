@@ -69,7 +69,16 @@ export function useDragCosmetic(opts: Options) {
     try { a.el.releasePointerCapture(a.pointerId); } catch { /* ήδη ελεύθερο */ }
     document.body.classList.remove('is-dragging');
     const o = optsRef.current;
-    const res = a.lastRes;
+    // Τελική ανάλυση από τις συντεταγμένες του pointerup (όχι από την τελευταία κίνηση, που μπορεί
+    // να έχει συγχωνευθεί από τον browser) — η τοποθέτηση γίνεται ακριβώς εκεί που αφέθηκε.
+    let res = a.lastRes;
+    const stage = o.stageRef.current;
+    if (!cancelled && a.moved && stage && clientX !== undefined && clientY !== undefined) {
+      const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
+      const fp = stage.clientToFace(clientX, clientY - lift);
+      a.lastFacePt = fp;
+      res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp);
+    }
     if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
     try {
       if (!cancelled && a.moved && res && res.ok && clientX !== undefined && clientY !== undefined) {
@@ -104,14 +113,17 @@ export function useDragCosmetic(opts: Options) {
     const o = optsRef.current;
     const stage = o.stageRef.current;
     if (!stage) return;
-    const lift = a.pointerType === 'touch' ? TOUCH_LIFT * 0.5 : 0;
+    // Το σημείο ελέγχου = το κέντρο του φαντάσματος (σε αφή είναι ανασηκωμένο πάνω από το δάχτυλο).
+    const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
     const fp = stage.clientToFace(e.clientX, e.clientY - lift);
     a.lastFacePt = fp;
     const res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp);
-    const key = res.ok ? res.regionIds.join('+') : 'no';
+    // ΠΑΝΤΑ η τελευταία ανάλυση: για ελεύθερη τοποθέτηση (αυτοκόλλητα, γκλίτερ, βαμβάκι) το anchor
+    // αλλάζει σε κάθε κίνηση, ενώ οι περιοχές (key) δεν αλλάζουν — αλλιώς «κλειδώνει» στο σημείο εισόδου.
+    a.lastRes = res;
+    const key = res.ok ? res.regionIds.join('+') || 'free' : 'no';
     if (key !== a.lastKey) {
       a.lastKey = key;
-      a.lastRes = res;
       o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic), res);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

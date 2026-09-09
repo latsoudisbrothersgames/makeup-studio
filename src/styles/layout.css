@@ -88,6 +88,11 @@
   .hintbar {
     font-size: var(--fs-sm);
     padding: 4px 12px;
-    min-height: 44px;
+    /* Σταθερό ύψος 2 γραμμών: αν άλλαζε (1↔2 γραμμές) όσο σέρνεις, το πρόσωπο θα μετακινούνταν
+       και το αυτοκόλλητο θα έπεφτε αλλού από εκεί που το άφησες. */
+    height: 58px;
+    min-height: 58px;
+    line-height: 1.25;
+    overflow: hidden;
   }
 }
