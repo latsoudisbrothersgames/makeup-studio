@@ -78,54 +78,11 @@
     max-height: 46dvh;
   }
   .studio__panel {
-    max-height: 40dvh;
+    max-height: 42dvh;
   }
   .hintbar {
     font-size: var(--fs-sm);
     padding: 4px 12px;
     min-height: 44px;
-  }
-  .panel {
-    padding: 8px;
-    gap: 6px;
-  }
-  .panel__group {
-    min-height: 48px;
-    padding: 4px 2px;
-    font-size: clamp(10px, 2.9vw, 0.8rem);
-  }
-  .panel__group-emoji {
-    font-size: 1.2em;
-  }
-  .panel__hint {
-    font-size: 0.85rem;
-  }
-  .panel__cats {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-  }
-  .panel__cat {
-    flex: 0 0 84px;
-    scroll-snap-align: start;
-    min-height: 72px;
-    padding: 4px 2px;
-    font-size: 0.78rem;
-  }
-  .panel__cat-emoji {
-    font-size: 1.6rem;
-  }
-  .panel__swatches,
-  .panel__variants {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-  .swatch {
-    flex: 0 0 60px;
-    width: 60px;
-    min-height: 60px;
   }
 }

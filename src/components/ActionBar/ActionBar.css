@@ -55,19 +55,29 @@
     min-height: 60px;
     flex-direction: column;
     gap: 2px;
-    font-size: 0.72rem;
+    font-size: clamp(0.55rem, 2.35vw, 0.72rem);
+    line-height: 1.05;
     border-radius: var(--radius-md);
     overflow: hidden;
   }
   .actionbar__btns .btn__label {
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    text-align: center;
   }
   .actionbar__btns .btn__icon {
     font-size: 1.5rem;
   }
   .actionbar__who {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
     padding: 4px 12px;
+  }
+  .actionbar__label {
+    font-size: 0.75rem;
+  }
+  .actionbar__name {
+    font-size: 0.95rem;
   }
 }

@@ -169,3 +169,73 @@
   width: 44px;
   height: 44px;
 }
+
+/* ─── Κατακόρυφες / στενές οθόνες: όλα σε οριζόντιες λωρίδες, τίποτα δεν κόβεται ─────
+   ΠΡΟΣΟΧΗ: πρέπει να μείνουν εδώ (όχι στο layout.css) — το component CSS φορτώνει τελευταίο
+   και θα τους υπερίσχυε. */
+@media (max-width: 900px), (orientation: portrait) {
+  .panel {
+    padding: 8px;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .panel__group {
+    min-height: 48px;
+    padding: 4px 2px;
+    font-size: clamp(10px, 2.9vw, 0.8rem);
+  }
+  .panel__group-emoji {
+    font-size: 1.2em;
+  }
+  .panel__cats {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .panel__cats::-webkit-scrollbar { display: none; }
+  .panel__cat {
+    flex: 0 0 84px;
+    scroll-snap-align: start;
+    min-height: 74px;
+    padding: 4px 2px;
+    font-size: 0.78rem;
+  }
+  .panel__cat-emoji {
+    font-size: 1.6rem;
+  }
+  .panel__cat-img {
+    width: 40px;
+    height: 40px;
+  }
+  .panel__swatches-wrap {
+    flex: 0 0 auto;
+    overflow: visible;
+    gap: 4px;
+  }
+  .panel__hint {
+    font-size: 0.85rem;
+  }
+  .panel__swatches,
+  .panel__variants {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 2px 6px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel__swatches::-webkit-scrollbar,
+  .panel__variants::-webkit-scrollbar { display: none; }
+  .swatch {
+    flex: 0 0 60px;
+    width: 60px;
+    min-height: 60px;
+  }
+}
