@@ -55,6 +55,11 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
     target: { kind: 'regions', regions: ['lips'], mirror: false },
     palette: ['#c2185b', '#e53935', '#ff5252', '#ad1457', '#f06292', '#d84315', '#8e24aa', '#ff8a80'], anim: 'smile', zRank: 9, singleton: true,
   },
+  lipLiner: {
+    category: 'lipLiner', group: 'lips', labelEl: 'Μολύβι χειλιών', hintEl: 'Άφησε το μολύβι στα χείλη', emoji: '✏️',
+    target: { kind: 'regions', regions: ['lips'], mirror: false },
+    palette: ['#8e1b3a', '#b5423b', '#6d2b1f', '#a0446a', '#3e2723', '#d85a6a'], anim: 'smile', zRank: 9.5, singleton: true,
+  },
   gloss: {
     category: 'gloss', group: 'lips', labelEl: 'Γκλος', hintEl: 'Άφησε το γκλος στα χείλη', emoji: '💧',
     target: { kind: 'regions', regions: ['lips'], mirror: false },
@@ -63,6 +68,11 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
   beautySpot: {
     category: 'beautySpot', group: 'face', labelEl: 'Ελιά', hintEl: 'Άφησε την ελιά όπου θέλεις στο πρόσωπο', emoji: '⚫',
     target: { kind: 'free' }, palette: ['#3e2723', '#212121'], anim: 'smile', zRank: 11, singleton: false,
+  },
+  facePaint: {
+    category: 'facePaint', group: 'fun', labelEl: 'Μπογιές', hintEl: 'Άφησε τη μπογιά πάνω στο πρόσωπο', emoji: '🎭',
+    target: { kind: 'face' },
+    palette: ['#1a1a1a', '#e53935'], variants: ['cat', 'rainbow'], anim: 'wow', zRank: 11.5, singleton: true,
   },
   glitter: {
     category: 'glitter', group: 'fun', labelEl: 'Γκλίτερ', hintEl: 'Άφησε το γκλίτερ όπου θέλεις στο πρόσωπο', emoji: '🌟',
@@ -82,6 +92,10 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
     category: 'hairStreak', group: 'hair', labelEl: 'Τούφα', hintEl: 'Άφησε το χρώμα πάνω στην τούφα, στα αριστερά', emoji: '🌈',
     target: { kind: 'regions', regions: ['hairStreak'], mirror: false }, palette: HAIR_PALETTE, anim: 'smile', zRank: 21, singleton: true,
   },
+  remover: {
+    category: 'remover', group: 'fun', labelEl: 'Βαμβάκι', hintEl: 'Σύρε το βαμβάκι εκεί που θέλεις να σβήσεις', emoji: '🧻',
+    target: { kind: 'any' }, palette: ['#ffffff'], anim: 'none', zRank: 99, singleton: false,
+  },
   mask: {
     category: 'mask', group: 'face', labelEl: 'Μάσκα προσώπου', hintEl: 'Άφησε τη μάσκα πάνω στο πρόσωπο', emoji: '🎭',
     target: { kind: 'face' },
@@ -100,9 +114,9 @@ export const GROUPS: { id: CosmeticGroup; labelEl: string; emoji: string }[] = [
 export const CATEGORY_ORDER: CosmeticCategory[] = [
   'foundation', 'concealer', 'blush', 'highlighter', 'freckles', 'beautySpot', 'mask',
   'eyeshadow', 'eyeliner', 'mascara', 'brow',
-  'lipstick', 'gloss',
+  'lipstick', 'lipLiner', 'gloss',
   'hairColor', 'hairStreak',
-  'glitter', 'sticker',
+  'facePaint', 'glitter', 'sticker', 'remover',
 ];
 
 export function categoriesOf(group: CosmeticGroup): Cosmetic[] {
@@ -113,4 +127,5 @@ export function categoriesOf(group: CosmeticGroup): Cosmetic[] {
 export const VARIANT_LABELS: Record<string, string> = {
   sheet: 'Υφασμάτινη', cream: 'Κρέμα', clay: 'Άργιλος',
   heart: 'Καρδιά', star: 'Αστέρι', gem: 'Πετράδι', flower: 'Λουλούδι', butterfly: 'Πεταλούδα',
+  cat: 'Γατούλα', rainbow: 'Ουράνιο τόξο',
 };

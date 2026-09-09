@@ -12,6 +12,14 @@ export type FaceImages = Record<Expression, CanvasImageSource> & {
   hair?: CanvasImageSource;
 };
 
+/** Σειρά σχεδίασης: zRank, μετά σειρά εφαρμογής. */
+export function sortLayers(layers: AppliedLayer[], catalogue: Record<CosmeticCategory, Cosmetic>): AppliedLayer[] {
+  return layers
+    .map((l, i) => ({ l, i, z: catalogue[l.category].zRank }))
+    .sort((a, b) => a.z - b.z || a.i - b.i)
+    .map((x) => x.l);
+}
+
 /**
  * Συνθέτει βάση (ανά έκφραση) + στρώματα μακιγιάζ σε έναν καμβά 512×512.
  * Τα περάσματα κάθε στρώματος υπολογίζονται μία φορά ανά (στρώμα, έκφραση) και αποθηκεύονται.
@@ -75,10 +83,7 @@ export class Compositor {
   }
 
   private sorted(layers: AppliedLayer[]): AppliedLayer[] {
-    return layers
-      .map((l, i) => ({ l, i, z: this.catalogue[l.category].zRank }))
-      .sort((a, b) => a.z - b.z || a.i - b.i)
-      .map((x) => x.l);
+    return sortLayers(layers, this.catalogue);
   }
 
   /** Αποδίδει στο `out`. `pulse` = πολλαπλασιαστής alpha για τα περάσματα με pulse (ρουζ). */

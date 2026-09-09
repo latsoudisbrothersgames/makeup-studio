@@ -17,7 +17,10 @@ export type CosmeticCategory =
   | 'freckles'
   | 'beautySpot'
   | 'hairColor'
-  | 'hairStreak';
+  | 'hairStreak'
+  | 'facePaint'
+  | 'lipLiner'
+  | 'remover';
 
 export type CosmeticGroup = 'face' | 'eyes' | 'lips' | 'hair' | 'fun';
 
@@ -29,7 +32,9 @@ export type DropTarget =
   /** Οπουδήποτε πάνω στο δέρμα → ακριβώς εκεί. */
   | { kind: 'free' }
   /** Οπουδήποτε πάνω στα pixel των μαλλιών (hair.png) → όλα τα μαλλιά. */
-  | { kind: 'hair' };
+  | { kind: 'hair' }
+  /** Οπουδήποτε πάνω σε δέρμα ή μαλλιά → ακριβώς εκεί (βαμβάκι ντεμακιγιάζ). */
+  | { kind: 'any' };
 
 export type AnimTrigger = 'smile' | 'wow' | 'blushPulse' | 'none';
 

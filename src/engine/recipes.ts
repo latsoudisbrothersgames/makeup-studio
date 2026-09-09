@@ -242,6 +242,81 @@ const gloss: Recipe = (layer, _c, env) => {
   ];
 };
 
+const RAINBOW = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa'];
+
+/**
+ * Μπογιές προσώπου: έτοιμα σχέδια ζωγραφισμένα πάνω στις περιοχές (ακολουθούν την έκφραση,
+ * κόβονται στο δέρμα, οι τούφες τα καλύπτουν). Χωρίς εικαστικά.
+ */
+const facePaint: Recipe = (layer, _c, env) => {
+  const variant = layer.variant ?? 'cat';
+  const m = env.mask('skin', 1);
+  if (variant === 'rainbow') {
+    return [
+      paintMasked(m, (ctx) => {
+        ctx.lineCap = 'butt';
+        for (const id of ['cheekL', 'cheekR'] as RegionId[]) {
+          const pts = env.points(id);
+          if (pts.length < 3) continue;
+          const [cx, cy] = centroid(pts);
+          const bb = polyBBox(pts);
+          const R = Math.max(22, Math.min(bb.w, bb.h) * 0.55);
+          RAINBOW.forEach((col, i) => {
+            ctx.strokeStyle = col;
+            ctx.lineWidth = 3.2;
+            ctx.beginPath();
+            ctx.arc(cx, cy + 6, R - i * 3, Math.PI, 2 * Math.PI);
+            ctx.stroke();
+          });
+        }
+      }, 'source-over', 0.85),
+    ];
+  }
+  // Γατούλα: μυτούλα, γραμμή προς τα χείλη, 3 μουστάκια και 3 τελίτσες σε κάθε πλευρά.
+  const nose = env.points('noseBridge');
+  const nb = polyBBox(nose);
+  const tx = nb.x + nb.w / 2, ty = nb.y + nb.h - 6;
+  const lipsTop = polyBBox(env.points('lips')).y;
+  const col = layer.color || '#1a1a1a';
+  return [
+    paintMasked(m, (ctx) => {
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(tx - 10, ty - 6); ctx.lineTo(tx + 10, ty - 6); ctx.lineTo(tx, ty + 5); ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(tx, ty + 4); ctx.lineTo(tx, lipsTop - 2); ctx.stroke();
+      for (const s of [-1, 1]) {
+        for (let i = 0; i < 3; i++) {
+          const y0 = ty + 2 + i * 7, x0 = tx + s * 18;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + s * 62, y0 + (i - 1) * 14); ctx.stroke();
+          ctx.beginPath(); ctx.arc(x0 - s * 4, y0, 1.6, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }, 'source-over', 0.92),
+  ];
+};
+
+/** Μολύβι χειλιών: περίγραμμα του πολυγώνου των χειλιών (ακολουθεί το χαμόγελο). */
+const lipLiner: Recipe = (layer, _c, env) => {
+  const pts = env.points('lips');
+  if (pts.length < 3) return [];
+  const bb = expandBBox(polyBBox(pts), 6);
+  const c = makeCanvas(bb.w, bb.h);
+  const ctx = ctx2d(c);
+  ctx.translate(-bb.x, -bb.y);
+  ctx.strokeStyle = layer.color;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  tracePoly(ctx, pts);
+  ctx.stroke();
+  return [{ canvas: c, x: bb.x, y: bb.y, blend: 'multiply', alpha: 0.8 * env.face.tuning.multiply }];
+};
+
 const mask: Recipe = (layer, _c, env) => {
   const m = copyMask(env.mask('faceBox', 1));
   cutHoles(m, [env.points('eyeHoleL'), env.points('eyeHoleR'), env.points('mouthHole')], 2);
@@ -427,6 +502,10 @@ export const RECIPES: Record<Cosmetic['category'], Recipe> = {
   // Τα μαλλιά δεν είναι πέρασμα: συντίθενται στο Compositor.hairImage (βλ. hairColor.ts).
   hairColor: () => [],
   hairStreak: () => [],
+  facePaint,
+  lipLiner,
+  // Το βαμβάκι δεν ζωγραφίζει: αφαιρεί στρώμα (βλ. StudioScreen.onDrop).
+  remover: () => [],
 };
 
 export { featheredMask, clipMask, tracePoly };

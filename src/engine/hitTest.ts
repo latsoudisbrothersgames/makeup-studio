@@ -28,6 +28,7 @@ export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmeti
   if (t.kind === 'regions') return t.regions.filter((id) => getRegion(face.regions, expr, id).points.length >= 2);
   if (t.kind === 'face') return ['faceBox'];
   if (t.kind === 'hair') return ['hair'];
+  if (t.kind === 'any') return ['skin', 'hair'];
   return ['skin'];
 }
 
@@ -51,6 +52,10 @@ export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p:
     if (!hitsRegion(face, expr, 'skin', p, 30)) return { ok: false };
     const [ax, ay] = centroid(getRegion(face.regions, expr, 'skin').points);
     return { ok: true, regionIds: ['skin'], anchor: [ax, ay] };
+  }
+  if (t.kind === 'any') {
+    if (!hitsRegion(face, expr, 'skin', p, 30) && !hairHit(face.id, p, 22)) return { ok: false };
+    return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };
   }
   if (t.kind === 'hair') {
     if (!hairHit(face.id, p, 22)) return { ok: false };

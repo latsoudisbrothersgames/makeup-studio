@@ -11,6 +11,7 @@ export interface StudioState {
 export type StudioAction =
   | { type: 'apply'; layer: AppliedLayer }
   | { type: 'undo' }
+  | { type: 'remove'; id: string }
   | { type: 'clear' }
   | { type: 'load'; layers: AppliedLayer[] }
   | { type: 'markSaved' };
@@ -35,6 +36,11 @@ export function studioReducer(state: StudioState, action: StudioAction): StudioS
         layers = layers.filter((l) => !(l.category === action.layer.category && sameRegions(l.regionIds, action.layer.regionIds)));
       }
       return { layers: [...layers, action.layer], history, dirty: true };
+    }
+    case 'remove': {
+      if (!state.layers.some((l) => l.id === action.id)) return state;
+      const history = [...state.history.slice(-(MAX_HISTORY - 1)), state.layers];
+      return { layers: state.layers.filter((l) => l.id !== action.id), history, dirty: true };
     }
     case 'undo': {
       if (state.history.length === 0) return state;

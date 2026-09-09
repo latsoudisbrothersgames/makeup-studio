@@ -7,6 +7,18 @@
   min-width: 0;
 }
 
+.actionbar__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.actionbar__nav {
+  display: flex;
+  gap: 8px;
+}
+
 .actionbar__who {
   display: flex;
   flex-direction: column;
@@ -43,6 +55,22 @@
   .actionbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 6px;
+  }
+  .actionbar__top {
+    gap: 6px;
+  }
+  .actionbar__who {
+    flex: 1;
+  }
+  .actionbar__nav .btn {
+    min-height: 40px;
+    padding: 0.2em 0.6em;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  .actionbar__nav .btn__icon {
+    font-size: 1.1rem;
   }
   .actionbar__btns {
     display: grid;

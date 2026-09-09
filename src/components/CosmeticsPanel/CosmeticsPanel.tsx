@@ -45,7 +45,9 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
   const cosmetic = COSMETICS[sel.category];
   const palette = paletteFor(cosmetic, face);
   const isStickers = cosmetic.category === 'sticker';
-  const isMask = cosmetic.category === 'mask';
+  // Μάσκα και μπογιές: επιλέγονται μόνο παραλλαγές (κάθε παραλλαγή έχει το χρώμα της), όχι swatches.
+  const isMask = cosmetic.category === 'mask' || cosmetic.category === 'facePaint';
+  const showSwatches = !isMask && palette.length > 1;
 
   const payload = (color: string, variant?: string): DragPayload => ({ cosmetic, color, variant });
 
@@ -127,7 +129,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag }: Props) {
             })}
           </div>
         )}
-        {!isMask && (
+        {showSwatches && (
           <div className="panel__swatches">
             {palette.map((color) => (
               <button
@@ -160,6 +162,8 @@ function variantGlyph(v: string): string {
     case 'gem': return '◆';
     case 'flower': return '✿';
     case 'butterfly': return '🦋';
+    case 'cat': return '🐱';
+    case 'rainbow': return '🌈';
     case 'sheet': return '🧻';
     case 'cream': return '🧴';
     case 'clay': return '🪨';

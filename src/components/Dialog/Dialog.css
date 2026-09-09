@@ -80,3 +80,17 @@
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Στενές οθόνες: τα κουμπιά του διαλόγου αναδιπλώνονται αντί να βγαίνουν εκτός οθόνης */
+@media (max-width: 600px) {
+  .dialog__actions {
+    flex-wrap: wrap;
+  }
+  .dialog__actions .btn {
+    flex: 1 1 45%;
+    min-width: 0;
+  }
+  .dialog__actions .btn__label {
+    white-space: normal;
+  }
+}
