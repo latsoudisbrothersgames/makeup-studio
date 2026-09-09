@@ -11,6 +11,8 @@ import { MIRROR } from '../engine/geometry';
 
 const SCALE = 2;
 const AXIS_X = 256;
+type AnchorId = keyof RegionMap['anchors'];
+const ANCHOR_IDS: AnchorId[] = ['lipHighlight', 'lipHighlightSmile', 'accL', 'accR', 'accTop'];
 
 /**
  * Επεξεργαστής περιοχών (μόνο για ανάπτυξη): #/dev/regions?face=f1
@@ -24,6 +26,8 @@ export function RegionEditor() {
   const [map, setMap] = useState<RegionMap>(() => structuredClone(face.regions));
   const [expr, setExpr] = useState<Expression>('neutral');
   const [sel, setSel] = useState<RegionId>('lips');
+  /** Όταν είναι ορισμένο, το κλικ τοποθετεί αυτή την άγκυρα αντί για κορυφή. */
+  const [anchorSel, setAnchorSel] = useState<AnchorId | null>(null);
   const [images, setImages] = useState<FaceImages | null>(null);
   const [showAll, setShowAll] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -75,9 +79,19 @@ export function RegionEditor() {
         });
       }
     }
+    for (const a of ANCHOR_IDS) {
+      const pt = map.anchors[a];
+      if (!pt) continue;
+      const [x, y] = pt;
+      ctx.strokeStyle = a === anchorSel ? '#ffd400' : '#00c853';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x * SCALE - 8, y * SCALE); ctx.lineTo(x * SCALE + 8, y * SCALE);
+      ctx.moveTo(x * SCALE, y * SCALE - 8); ctx.lineTo(x * SCALE, y * SCALE + 8); ctx.stroke();
+      ctx.fillStyle = ctx.strokeStyle; ctx.font = '11px sans-serif'; ctx.fillText(a, x * SCALE + 10, y * SCALE - 4);
+    }
     ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath(); ctx.moveTo(AXIS_X * SCALE, 0); ctx.lineTo(AXIS_X * SCALE, 512 * SCALE); ctx.stroke();
-  }, [images, regions, sel, expr, showAll]);
+  }, [images, regions, sel, expr, showAll, map.anchors, anchorSel]);
 
   const toFace = (e: React.PointerEvent): [number, number] => {
     const r = canvasRef.current!.getBoundingClientRect();
@@ -86,6 +100,10 @@ export function RegionEditor() {
 
   const onDown = (e: React.PointerEvent) => {
     const [x, y] = toFace(e);
+    if (anchorSel) {
+      setMap((m) => ({ ...m, anchors: { ...m.anchors, [anchorSel]: [x, y] } }));
+      return;
+    }
     const idx = current.points.findIndex(([px, py]) => Math.abs(px - x) <= 4 && Math.abs(py - y) <= 4);
     if (idx >= 0) {
       dragIdx.current = idx;
@@ -192,6 +210,18 @@ export function RegionEditor() {
             </button>
           ))}
         </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {ANCHOR_IDS.map((a) => (
+            <button
+              key={a}
+              type="button"
+              onClick={() => setAnchorSel(anchorSel === a ? null : a)}
+              style={{ padding: '4px 6px', borderRadius: 8, background: a === anchorSel ? '#ffd400' : '#fff', border: '1px solid #ccc', fontSize: 11 }}
+            >
+              ⌖ {a}{map.anchors[a] ? ` (${map.anchors[a]![0]},${map.anchors[a]![1]})` : ''}
+            </button>
+          ))}
+        </div>
         <div style={{ color: '#555' }}>
           {sel}: {current.points.length} σημεία{bb ? ` · bbox ${bb.w}×${bb.h}` : ''}{isVariant ? ' · παραλλαγή' : ''}
         </div>
@@ -205,7 +235,7 @@ export function RegionEditor() {
         )}
         <Button variant="mint" onClick={exportJson}>Εξαγωγή JSON</Button>
         <Button variant="secondary" onClick={exportMask} disabled={!isVariant}>Εξαγωγή μάσκας PNG</Button>
-        <p style={{ color: '#777' }}>Κλικ = κορυφή, σύρσιμο = μετακίνηση, Backspace = αφαίρεση. Αποθήκευσε το JSON ως src/data/faces/{face.id}.regions.json</p>
+        <p style={{ color: '#777' }}>Κλικ = κορυφή, σύρσιμο = μετακίνηση, Backspace = αφαίρεση. Με ενεργή άγκυρα (⌖) το κλικ την τοποθετεί. Αποθήκευσε το JSON ως src/data/faces/{face.id}.regions.json</p>
       </div>
     </main>
   );

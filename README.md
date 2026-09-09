@@ -14,6 +14,9 @@ npm run shots      # στιγμιότυπα desktop/laptop/iPad/iPhone με το
 ## Δομή
 - `src/engine/` — compositor (blend modes + φτερωτές μάσκες), συνταγές καλλυντικών, hit-test, animator
 - `src/data/faces/<id>.regions.json` — πολύγωνα περιοχών ανά πρόσωπο (χείλη, μάγουλα, βλέφαρα…) και παραλλαγές έκφρασης
-- `src/assets/faces/<id>/{neutral,blink,smile,wow}.png` — PixelLab 512×512
-- `tools/pl.py`, `tools/face_variants.py`, `tools/face_grid.py` — PixelLab pipeline· `#/dev/regions?face=f1` — επεξεργαστής περιοχών
+- `src/assets/faces/<id>/{neutral,blink,smile,wow}.png` — PixelLab 512×512· `hair.png` = ξεχωριστό επίπεδο μαλλιών (σχεδιάζεται ΠΑΝΩ από το μακιγιάζ, ώστε οι τούφες να καλύπτουν μάσκα/μπογιές)
+- `tools/hair_layer.py` — εξάγει το `hair.png` από τη βάση (λίστα χρωμάτων ανά μοντέλο + αφαίρεση φρυδιών/ματιών με τα πολύγωνα)· χωρίς PixelLab
+- Περιοχές μαλλιών στο JSON: `hairStreak` (πλαϊνή τούφα για δεύτερο χρώμα)· άγκυρες `accL/accR/accTop` (θέσεις αξεσουάρ, ορίζονται στον editor με ⌖)
+- `tools/pl.py`, `tools/face_variants.py`, `tools/face_grid.py` — PixelLab pipeline· `#/dev/regions?face=f1` — επεξεργαστής περιοχών (πολύγωνα + άγκυρες)
+- `node tools/maskshot.mjs` — στιγμιότυπα μάσκας+μακιγιάζ στα 4 πρόσωπα (έλεγχος ότι τα μαλλιά καλύπτουν τη μάσκα)
 - `?test=1` → `window.__studio` API για δοκιμές· `?debug=1` → εμφάνιση περιοχών

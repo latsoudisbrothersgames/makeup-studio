@@ -24,6 +24,13 @@ export function loadFaceImages(face: Face): Promise<FaceImages> {
         }
         out[e] = drawPlaceholderFace(face, e);
       }
+      if (face.hairUrl) {
+        try {
+          out.hair = await loadImage(face.hairUrl);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
       return out;
     })();
     cache.set(face.id, p);

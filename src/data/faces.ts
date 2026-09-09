@@ -13,6 +13,10 @@ function regionsFor(id: FaceId): RegionMap {
   return buildRegionMap(DEFAULT_PARAMS);
 }
 
+function hairFor(id: FaceId): string | undefined {
+  return faceImages[`../assets/faces/${id}/hair.png`];
+}
+
 function imagesFor(id: FaceId): Face['images'] {
   const out: Face['images'] = {};
   for (const [path, url] of Object.entries(faceImages)) {
@@ -30,7 +34,7 @@ function shades(hex: string): string[] {
   return [to(1.12), to(1.06), hex, to(0.94), to(0.86)];
 }
 
-const BASE: Omit<Face, 'regions' | 'images' | 'foundationShades'>[] = [
+const BASE: Omit<Face, 'regions' | 'images' | 'hairUrl' | 'foundationShades'>[] = [
   { id: 'f1', nameEl: 'Ελένη', hair: 'blonde', skinTone: '#f1d6c0', hairTone: '#e8c36a', tuning: { multiply: 1, color: 1, screen: 1 } },
   { id: 'f2', nameEl: 'Μαρία', hair: 'brunette', skinTone: '#d8a882', hairTone: '#4a2e1e', tuning: { multiply: 0.95, color: 1.05, screen: 1.05 } },
   { id: 'f3', nameEl: 'Άννα', hair: 'red', skinTone: '#f4dccb', hairTone: '#c4552a', tuning: { multiply: 1, color: 1, screen: 1 } },
@@ -41,6 +45,7 @@ export const FACES: Face[] = BASE.map((b) => ({
   ...b,
   foundationShades: shades(b.skinTone),
   images: imagesFor(b.id),
+  hairUrl: hairFor(b.id),
   regions: regionsFor(b.id),
 }));
 

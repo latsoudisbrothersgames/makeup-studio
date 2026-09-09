@@ -6,7 +6,10 @@ import { RECIPES, type Pass, type RecipeEnv } from './recipes';
 import { getPoints } from './regions';
 
 export type SpriteMap = Record<string, HTMLImageElement>;
-export type FaceImages = Record<Expression, CanvasImageSource>;
+export type FaceImages = Record<Expression, CanvasImageSource> & {
+  /** Επίπεδο μαλλιών: σχεδιάζεται ΠΑΝΩ από όλο το μακιγιάζ ώστε οι τούφες να καλύπτουν μάσκα, μπογιές κ.λπ. */
+  hair?: CanvasImageSource;
+};
 
 /**
  * Συνθέτει βάση (ανά έκφραση) + στρώματα μακιγιάζ σε έναν καμβά 512×512.
@@ -103,12 +106,19 @@ export class Compositor {
     }
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
+    const hair = this.hairImage();
+    if (hair) ctx.drawImage(hair, 0, 0);
     if (pulse === 1) {
       const snap = makeCanvas(512, 512);
       ctx2d(snap).drawImage(this.out, 0, 0);
       this.frameCache.set(expr, snap);
     }
     return this.out;
+  }
+
+  /** Το επίπεδο μαλλιών όπως θα σχεδιαστεί (βήμα 2: εδώ μπαίνει η αλλαγή χρώματος). */
+  protected hairImage(): CanvasImageSource | undefined {
+    return this.images.hair;
   }
 
   /** Προθέρμανση των περασμάτων ενός στρώματος για τις άλλες εκφράσεις (σε idle χρόνο). */

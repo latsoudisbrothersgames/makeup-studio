@@ -23,7 +23,12 @@ export function validateRegionMap(v: unknown): v is RegionMap {
   if (m.size !== 512 || !m.regions || typeof m.regions !== 'object') return false;
   for (const id of REGION_IDS) {
     const r = m.regions[id];
-    if (!r || !Array.isArray(r.points)) return false;
+    if (!r) {
+      // Νεότερες περιοχές (π.χ. hair, hairStreak) μπορεί να λείπουν από παλιό JSON → κενό πολύγωνο.
+      m.regions[id] = { id, kind: 'polygon', points: [] };
+      continue;
+    }
+    if (!Array.isArray(r.points)) return false;
   }
   return !!m.anchors && Array.isArray(m.anchors.lipHighlight);
 }
