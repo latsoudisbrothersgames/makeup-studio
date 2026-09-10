@@ -33,7 +33,7 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
   eyeshadow: {
     category: 'eyeshadow', group: 'eyes', labelEl: 'Σκιά ματιών', hintEl: 'Άφησε τη σκιά στα βλέφαρα', emoji: '🎨',
     target: { kind: 'regions', regions: ['lidL', 'lidR'], mirror: true },
-    palette: ['#7e57c2', '#5c6bc0', '#26a69a', '#ec407a', '#ffca28', '#8d6e63', '#90a4ae', '#43a047'], anim: 'smile', zRank: 5, singleton: true,
+    palette: ['#7e57c2', '#5c6bc0', '#26a69a', '#ec407a', '#ffca28', '#8d6e63', '#90a4ae', '#43a047', '#ffd700', '#c0c0c0', '#ff1493'], anim: 'smile', zRank: 5, singleton: true,
   },
   eyeliner: {
     category: 'eyeliner', group: 'eyes', labelEl: 'Άιλάινερ', hintEl: 'Άφησε το άιλάινερ στα μάτια', emoji: '🖊️',
@@ -53,7 +53,7 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
   lipstick: {
     category: 'lipstick', group: 'lips', labelEl: 'Κραγιόν', hintEl: 'Άφησε το κραγιόν στα χείλη', emoji: '💄',
     target: { kind: 'regions', regions: ['lips'], mirror: false },
-    palette: ['#c2185b', '#e53935', '#ff5252', '#ad1457', '#f06292', '#d84315', '#8e24aa', '#ff8a80'], anim: 'smile', zRank: 9, singleton: true,
+    palette: ['#c2185b', '#e53935', '#ff5252', '#ad1457', '#f06292', '#d84315', '#8e24aa', '#ff8a80', '#1e88e5', '#ffd700', '#2e7d32', '#111111'], anim: 'smile', zRank: 9, singleton: true,
   },
   lipLiner: {
     category: 'lipLiner', group: 'lips', labelEl: 'Μολύβι χειλιών', hintEl: 'Άφησε το μολύβι στα χείλη', emoji: '✏️',
@@ -86,7 +86,7 @@ export const COSMETICS: Record<CosmeticCategory, Cosmetic> = {
   },
   glitter: {
     category: 'glitter', group: 'fun', labelEl: 'Γκλίτερ', hintEl: 'Άφησε το γκλίτερ όπου θέλεις στο πρόσωπο', emoji: '🌟',
-    target: { kind: 'free' }, palette: ['#ffd54f', '#f48fb1', '#80deea', '#ce93d8', '#ffffff'], anim: 'smile', zRank: 12, singleton: false,
+    target: { kind: 'free' }, palette: ['#ffd54f', '#f48fb1', '#80deea', '#ce93d8', '#ffffff', '#ffd700', '#69f0ae', '#ff4081'], anim: 'smile', zRank: 12, singleton: false,
   },
   sticker: {
     category: 'sticker', group: 'fun', labelEl: 'Αυτοκόλλητα', hintEl: 'Άφησε το αυτοκόλλητο όπου θέλεις στο πρόσωπο', emoji: '💖',

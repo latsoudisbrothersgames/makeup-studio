@@ -13,7 +13,8 @@ import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
 import { briefById, evaluate, nextCustomer, type Customer, type Verdict } from '../data/salon';
 import { S } from '../data/strings';
-import { newlyUnlocked, unlockFor, type Unlock } from '../data/unlocks';
+import { newlyUnlocked, type Unlock } from '../data/unlocks';
+import { lockedMessage } from '../data/shop';
 import { testHooksEnabled } from '../dev/testHook';
 import { FaceAnimator, type Particle } from '../engine/animator';
 import { Compositor, type SpriteMap } from '../engine/compositor';
@@ -213,9 +214,8 @@ export function SalonScreen() {
   });
 
   const onLocked = (key: string) => {
-    const u = unlockFor(key);
     playSound('boing');
-    setToast(u ? S.lockedHint(u.stars) : S.lockedGeneric);
+    setToast(lockedMessage(key));
   };
 
   // ── Test hook ─────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ export function SalonScreen() {
         {hint.text}
       </button>
       <div className="studio__stage salon__stage">
-        <FaceStage face={face} compositor={compositor} ref={stageRef} />
+        <FaceStage face={face} compositor={compositor} ref={stageRef} bg={session.stageBg} />
       </div>
       <div className="studio__panel">
         <CosmeticsPanel face={face} sel={sel} onSel={setSel} onStartDrag={(e, p) => drag.startDrag(e, p)} locked={locked} onLocked={onLocked} />
@@ -326,6 +326,7 @@ export function SalonScreen() {
           actions={
             <>
               {stars < 3 && <Button variant="ghost" size="lg" onClick={fix} data-action="salon-fix">{S.salonFix}</Button>}
+              <Button variant="lilac" size="lg" icon="🛒" onClick={() => nav('/shop')} data-action="salon-shop">{S.shop}</Button>
               <Button variant="primary" size="lg" onClick={() => callNext()} data-action="salon-next" data-autofocus>{S.salonNext}</Button>
             </>
           }

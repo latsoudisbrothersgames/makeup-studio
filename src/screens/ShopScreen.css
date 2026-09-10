@@ -1,0 +1,106 @@
+.shop__head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop__wallet {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.shop__who { font-size: var(--fs-sm); font-weight: 700; color: var(--text-600); }
+
+.shop__coins {
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  color: #b8860b;
+  background: #fff8dc;
+  border: 3px solid #f5d76e;
+  border-radius: var(--radius-pill);
+  padding: 4px 14px;
+}
+
+.shop__section {
+  font-size: var(--fs-lg);
+  color: var(--plum-900);
+  margin-top: 8px;
+}
+
+.shop__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.shop__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid var(--pink-100);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.shop__card.is-owned { border-color: #f5d76e; background: #fffdf3; }
+.shop__card.is-inuse { box-shadow: 0 0 0 3px var(--mint-500); }
+
+.shop__art {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+}
+
+.shop__swatch {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: var(--shadow-sm), inset 0 -6px 0 rgba(0, 0, 0, 0.12);
+}
+
+.shop__icon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.shop__bg {
+  display: block;
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm), inset 0 0 0 3px #fff;
+}
+
+.shop__label { font-size: var(--fs-md); color: var(--plum-900); line-height: 1.15; }
+.shop__meta { font-size: var(--fs-sm); color: var(--text-600); font-weight: 700; }
+
+.shop__owned {
+  font-weight: 800;
+  color: var(--mint-600);
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+}
+
+.shop__card .btn { min-width: 110px; }
+
+@media (max-width: 600px) {
+  .shop__head { grid-template-columns: auto 1fr; }
+  .shop__wallet { grid-column: 1 / -1; flex-direction: row; justify-content: center; align-items: center; gap: 10px; }
+  .shop__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .shop__card { padding: 10px 6px; }
+  .shop__card .btn { min-width: 0; width: 100%; }
+}

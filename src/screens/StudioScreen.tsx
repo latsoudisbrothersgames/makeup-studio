@@ -14,6 +14,7 @@ import { Toast } from '../components/Toast/Toast';
 import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
 import { S } from '../data/strings';
+import { lockedMessage } from '../data/shop';
 import { loadSprites } from '../assets/sprites';
 import { FaceAnimator, type Particle } from '../engine/animator';
 import { Compositor, type SpriteMap } from '../engine/compositor';
@@ -28,7 +29,6 @@ import { installTestHook, testHooksEnabled } from '../dev/testHook';
 import { useDragCosmetic, type DragPayload } from '../hooks/useDragCosmetic';
 import { useFaceImages } from '../hooks/useFaceImages';
 import { usePlayerStars } from '../hooks/usePlayerStars';
-import { unlockFor } from '../data/unlocks';
 import { loadDraft, loadGallery, newProjectId, sanitizeName, saveDraft, saveProject } from '../storage/gallery';
 import { useSession } from '../state/SessionContext';
 import { initialStudioState, newLayerId, studioReducer } from '../state/studioReducer';
@@ -375,7 +375,7 @@ export function StudioScreen() {
       </div>
       <div className={`hintbar studio__hint hintbar--${hint.mood}`} aria-live="polite">{hint.text}</div>
       <div className="studio__stage">
-        <FaceStage face={face} compositor={compositor} ref={stageRef} />
+        <FaceStage face={face} compositor={compositor} ref={stageRef} bg={session.stageBg} />
       </div>
       <div className="studio__panel">
         <CosmeticsPanel
@@ -384,7 +384,7 @@ export function StudioScreen() {
           onSel={setSel}
           onStartDrag={(e, p) => drag.startDrag(e, p)}
           locked={locked}
-          onLocked={(k) => { const u = unlockFor(k); playSound('boing'); setToast(u ? S.lockedHint(u.stars) : S.lockedGeneric); }}
+          onLocked={(k) => { playSound('boing'); setToast(lockedMessage(k)); }}
         />
       </div>
       <DragGhost ghost={drag.ghost} ref={drag.ghostRef} />

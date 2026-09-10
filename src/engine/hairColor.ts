@@ -22,6 +22,10 @@ export const HAIR_RAMPS: Record<string, Ramp> = {
   '#9a5ed8': ['#2c1052', '#4c2185', '#7237b8', '#9a5ed8', '#c69bf0'], // μωβ
   '#4f86ea': ['#0e2260', '#1a3c96', '#2b5fcf', '#4f86ea', '#8fb6f5'], // μπλε
   '#3fd0c9': ['#0a4a48', '#127a76', '#1fa8a3', '#3fd0c9', '#8fe8e2'], // τιρκουάζ
+  // Κατάστημα (data/shop.ts): κλειδωμένα με 🛒 μέχρι να αγοραστούν
+  '#2e9e5b': ['#0b3a20', '#186238', '#238a4b', '#2e9e5b', '#7fd39a'], // πράσινο
+  '#ff9f1c': ['#6b3506', '#a8560c', '#d97d12', '#ff9f1c', '#ffc76b'], // πορτοκαλί
+  '#e8e8f0': ['#6a6a7a', '#9a9aaa', '#c4c4d0', '#e8e8f0', '#ffffff'], // ασημί
 };
 
 export const HAIR_PALETTE = Object.keys(HAIR_RAMPS);

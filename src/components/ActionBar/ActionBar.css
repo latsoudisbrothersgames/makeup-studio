@@ -55,6 +55,9 @@
   .actionbar {
     flex-direction: column;
     align-items: stretch;
+    /* Με flex-wrap: wrap (από τον κανόνα desktop) η στήλη «τύλιγε» σε γραμμή ίση με το max-content
+       της μπάρας → με μακρύ όνομα η σειρά με το μοντέλο πλάταινε πέρα από την οθόνη. */
+    flex-wrap: nowrap;
     gap: 6px;
   }
   .actionbar__top {
@@ -107,5 +110,11 @@
   }
   .actionbar__name {
     font-size: 0.95rem;
+    /* Μακρύ όνομα («Ελένη · Ιόλη») δεν πλαταίνει τη σελίδα — κόβεται με … */
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .actionbar__nav {
+    flex: 0 0 auto;
   }
 }

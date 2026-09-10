@@ -13,7 +13,8 @@ import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
 import { LEVELS, levelById, makePreset, matchedItems, type Level } from '../data/presets';
 import { S } from '../data/strings';
-import { newlyUnlocked, unlockFor, type Unlock } from '../data/unlocks';
+import { newlyUnlocked, type Unlock } from '../data/unlocks';
+import { lockedMessage } from '../data/shop';
 import { testHooksEnabled } from '../dev/testHook';
 import { FaceAnimator, type Particle } from '../engine/animator';
 import { Compositor, type SpriteMap } from '../engine/compositor';
@@ -313,9 +314,8 @@ export function GameScreen() {
   });
 
   const onLocked = (key: string) => {
-    const u = unlockFor(key);
     playSound('boing');
-    setToast(u ? S.lockedHint(u.stars) : S.lockedGeneric);
+    setToast(lockedMessage(key));
   };
 
   // ── Test hook ─────────────────────────────────────────────────────
@@ -358,11 +358,11 @@ export function GameScreen() {
       <div className="game__stages">
         <div className="game__stage game__stage--target">
           <div className="game__label">{mode === 'duo' && phase === 'create' ? S.gameCreating(creator) : S.gameTarget}</div>
-          <FaceStage face={face} compositor={targetCompositor} ref={targetRef} />
+          <FaceStage face={face} compositor={targetCompositor} ref={targetRef} bg={session.stageBg} />
         </div>
         <div className="game__stage game__stage--you">
           <div className="game__label">{mode === 'duo' ? activeName || S.gameYou : S.gameYou}</div>
-          <FaceStage face={face} compositor={compositor} ref={stageRef} />
+          <FaceStage face={face} compositor={compositor} ref={stageRef} bg={session.stageBg} />
         </div>
       </div>
       <div className="game__panel">

@@ -49,3 +49,48 @@ body.is-dragging .face-stage__overlay {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
+
+/* ─── Σκηνικά (κατάστημα) — μόνο CSS, χωρίς εικαστικά ─── */
+.face-stage__frame[data-bg='hearts'] {
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255, 92, 138, 0.25) 0 14px, transparent 15px),
+    radial-gradient(circle at 75% 18%, rgba(255, 92, 138, 0.2) 0 10px, transparent 11px),
+    radial-gradient(circle at 85% 70%, rgba(255, 92, 138, 0.22) 0 16px, transparent 17px),
+    radial-gradient(circle at 12% 78%, rgba(255, 92, 138, 0.18) 0 12px, transparent 13px),
+    radial-gradient(circle at 50% 30%, #fff 0%, #ffe3ee 70%, #ffd0e0 100%);
+}
+.face-stage__frame[data-bg='stars'] {
+  background:
+    radial-gradient(circle at 15% 20%, #fff7c2 0 3px, transparent 4px),
+    radial-gradient(circle at 80% 15%, #fff7c2 0 4px, transparent 5px),
+    radial-gradient(circle at 88% 60%, #fff7c2 0 3px, transparent 4px),
+    radial-gradient(circle at 10% 65%, #fff7c2 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 60% 8%, #fff7c2 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 85%, #fff7c2 0 3px, transparent 4px),
+    linear-gradient(160deg, #6a4fd8 0%, #8b6ff0 55%, #b39cff 100%);
+}
+.face-stage__frame[data-bg='rainbow'] {
+  background: linear-gradient(180deg, #ff8a8a 0%, #ffd27a 20%, #fff59a 40%, #a8f0b0 60%, #9ad8ff 80%, #d3b8ff 100%);
+}
+.face-stage__frame[data-bg='night'] {
+  background:
+    radial-gradient(circle at 78% 18%, #fff3b0 0 22px, rgba(255, 243, 176, 0.25) 26px, transparent 34px),
+    radial-gradient(circle at 20% 30%, #fff 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 40% 12%, #fff 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 60% 40%, #fff 0 1px, transparent 2px),
+    radial-gradient(circle at 12% 70%, #fff 0 1.5px, transparent 2.5px),
+    linear-gradient(180deg, #1b1a4a 0%, #2c2a6e 60%, #4a3f8f 100%);
+}
+.face-stage__frame[data-bg='beach'] {
+  background:
+    linear-gradient(180deg, #8fd3ff 0%, #c9ecff 48%, #4fb8e6 48%, #7fd0f0 66%, #f7e2b0 66%, #f2d59a 100%),
+    radial-gradient(circle at 82% 16%, #ffe680 0 26px, transparent 28px);
+  background-blend-mode: normal;
+}
+.face-stage__frame[data-bg='beach']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 82% 16%, #ffe680 0 26px, rgba(255, 230, 128, 0.3) 30px, transparent 40px);
+  pointer-events: none;
+}

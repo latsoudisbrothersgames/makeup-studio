@@ -2,12 +2,15 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { loadLastName, readStorage, SETTINGS_KEY, saveLastName, writeStorage } from '../storage/session';
 import { setSoundEnabled } from '../audio/soundManager';
 import type { FaceId } from '../types/face';
+import { STAGE_BGS, type StageBg } from '../data/shop';
 
 export interface Session {
   faceId: FaceId | null;
   modelName: string;
   projectId: string | null;
   soundEnabled: boolean;
+  /** Σκηνικό πίσω από το πρόσωπο (αγορά από το κατάστημα). */
+  stageBg: StageBg;
 }
 
 interface SessionApi extends Session {
@@ -15,18 +18,20 @@ interface SessionApi extends Session {
   setModelName(name: string): void;
   setProjectId(id: string | null): void;
   setSound(on: boolean): void;
+  setStageBg(bg: StageBg): void;
 }
 
 const Ctx = createContext<SessionApi | null>(null);
 
-interface Settings { soundEnabled: boolean }
+interface Settings { soundEnabled: boolean; stageBg?: StageBg }
 const isSettings = (v: unknown): v is Settings => !!v && typeof v === 'object' && typeof (v as Settings).soundEnabled === 'boolean';
+const validBg = (b: unknown): StageBg => (STAGE_BGS.includes(b as StageBg) ? (b as StageBg) : 'classic');
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<Session>(() => {
     const settings = readStorage<Settings>(SETTINGS_KEY, { soundEnabled: true }, isSettings);
     setSoundEnabled(settings.soundEnabled);
-    return { faceId: null, modelName: loadLastName(), projectId: null, soundEnabled: settings.soundEnabled };
+    return { faceId: null, modelName: loadLastName(), projectId: null, soundEnabled: settings.soundEnabled, stageBg: validBg(settings.stageBg) };
   });
 
   const setFace = useCallback((faceId: FaceId) => setState((s) => ({ ...s, faceId })), []);
@@ -37,11 +42,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const setProjectId = useCallback((projectId: string | null) => setState((s) => ({ ...s, projectId })), []);
   const setSound = useCallback((soundEnabled: boolean) => {
     setSoundEnabled(soundEnabled);
-    writeStorage(SETTINGS_KEY, { soundEnabled });
-    setState((s) => ({ ...s, soundEnabled }));
+    setState((s) => { writeStorage(SETTINGS_KEY, { soundEnabled, stageBg: s.stageBg }); return { ...s, soundEnabled }; });
+  }, []);
+  const setStageBg = useCallback((stageBg: StageBg) => {
+    setState((s) => { writeStorage(SETTINGS_KEY, { soundEnabled: s.soundEnabled, stageBg }); return { ...s, stageBg }; });
   }, []);
 
-  const api = useMemo<SessionApi>(() => ({ ...state, setFace, setModelName, setProjectId, setSound }), [state, setFace, setModelName, setProjectId, setSound]);
+  const api = useMemo<SessionApi>(() => ({ ...state, setFace, setModelName, setProjectId, setSound, setStageBg }), [state, setFace, setModelName, setProjectId, setSound, setStageBg]);
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }
 

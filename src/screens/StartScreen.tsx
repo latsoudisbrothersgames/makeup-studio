@@ -35,7 +35,10 @@ export function StartScreen() {
         <Button size="xl" onClick={() => nav('/choose')} data-action="play">{S.play}</Button>
         <Button size="lg" variant="mint" icon="💇" onClick={() => nav('/salon')} data-action="salon">{S.salon}</Button>
         <Button size="lg" variant="sun" icon="🏆" onClick={() => nav('/choose?mode=game')} data-action="game">{S.game}</Button>
-        <Button size="lg" variant="secondary" icon="🖼️" onClick={() => nav('/gallery')}>{S.gallery}</Button>
+        <div className="start__row">
+          <Button size="lg" variant="lilac" icon="🛒" onClick={() => nav('/shop')} data-action="shop">{S.shop}</Button>
+          <Button size="lg" variant="secondary" icon="🖼️" onClick={() => nav('/gallery')} data-action="gallery">{S.gallery}</Button>
+        </div>
       </div>
       <StarBoard current={session.modelName} />
       <div className="start__footer">

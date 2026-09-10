@@ -8,6 +8,7 @@ import { StudioScreen } from './screens/StudioScreen';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { GameScreen } from './screens/GameScreen';
 import { SalonScreen } from './screens/SalonScreen';
+import { ShopScreen } from './screens/ShopScreen';
 import { RegionEditor } from './dev/RegionEditor';
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/gallery" element={<GalleryScreen />} />
           <Route path="/game" element={<GameScreen />} />
           <Route path="/salon" element={<SalonScreen />} />
+          <Route path="/shop" element={<ShopScreen />} />
           <Route path="/dev/regions" element={<RegionEditor />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

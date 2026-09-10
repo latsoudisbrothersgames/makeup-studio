@@ -3,6 +3,7 @@ import { playSound } from '../../audio/soundManager';
 import { categoriesOf, COSMETICS, GROUPS, VARIANT_LABELS } from '../../data/cosmetics';
 import { accessoryUrl, iconUrl, stickerUrl } from '../../assets';
 import { unlockKey } from '../../data/unlocks';
+import { SHOP_KEYS } from '../../data/shop';
 import { useHairstyleThumbs } from '../../hooks/useHairstyleThumbs';
 import type { DragPayload } from '../../hooks/useDragCosmetic';
 import type { Cosmetic, CosmeticCategory, CosmeticGroup } from '../../types/cosmetic';
@@ -49,6 +50,8 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked
   const cats = useMemo(() => categoriesOf(sel.group), [sel.group]);
   const cosmetic = COSMETICS[sel.category];
   const isLocked = (v: string) => !!locked?.has(unlockKey(cosmetic.category, v));
+  /** 🛒 για πράγματα του καταστήματος, 🔒 για ξεκλειδώματα με αστέρια. */
+  const lockGlyph = (v: string) => (SHOP_KEYS.has(unlockKey(cosmetic.category, v)) ? '🛒' : '🔒');
   const palette = paletteFor(cosmetic, face);
   const isStickers = cosmetic.category === 'sticker';
   const isAccessory = cosmetic.category === 'accessory';
@@ -138,7 +141,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked
                   title={VARIANT_LABELS[v] ?? v}
                 >
                   {st ? <img src={st} alt="" className="pixelated" draggable={false} /> : <span className="swatch__glyph" style={{ color: isStickers ? sel.color : undefined }}>{variantGlyph(v)}</span>}
-                  {lockedV && <span className="swatch__lock" aria-hidden="true">🔒</span>}
+                  {lockedV && <span className="swatch__lock" aria-hidden="true">{lockGlyph(v)}</span>}
                 </button>
               );
             })}
@@ -164,7 +167,7 @@ export function CosmeticsPanel({ face, sel, onSel, onStartDrag, locked, onLocked
                   }}
                   aria-label={`${cosmetic.labelEl} ${color}`}
                 >
-                  <span className="swatch__emoji" aria-hidden="true">{lockedC ? '🔒' : cosmetic.emoji}</span>
+                  <span className="swatch__emoji" aria-hidden="true">{lockedC ? lockGlyph(color) : cosmetic.emoji}</span>
                 </button>
               );
             })}

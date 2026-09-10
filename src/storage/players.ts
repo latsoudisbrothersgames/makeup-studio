@@ -18,6 +18,8 @@ export interface PlayerStats {
   coins?: number;
   /** Πελάτισσες που εξυπηρετήθηκαν στο Σαλόνι. */
   customers?: number;
+  /** Αγορές από το κατάστημα (ids από data/shop.ts). */
+  owned?: string[];
   updatedAt: string;
 }
 
@@ -84,4 +86,26 @@ export function addCoins(name: string, coins: number): number {
   writeStorage(PLAYERS_KEY, table);
   window.dispatchEvent(new CustomEvent('makeup:players-changed'));
   return cur.coins;
+}
+
+export function playerOwned(name: string): string[] {
+  return loadPlayers()[key(name)]?.owned ?? [];
+}
+
+/** Αγορά: αφαιρεί νομίσματα και προσθέτει το προϊόν. null αν δεν φτάνουν τα νομίσματα ή το έχει ήδη. */
+export function buyItem(name: string, itemId: string, price: number): { coins: number; owned: string[] } | null {
+  const table = loadPlayers();
+  const k = key(name);
+  const cur = table[k] ?? { name: name || ANONYMOUS, stars: 0, games: 0, best: {}, updatedAt: '' };
+  const owned = cur.owned ?? [];
+  const coins = cur.coins ?? 0;
+  if (owned.includes(itemId) || coins < price) return null;
+  cur.name = name || ANONYMOUS;
+  cur.coins = coins - price;
+  cur.owned = [...owned, itemId];
+  cur.updatedAt = new Date().toISOString();
+  table[k] = cur;
+  writeStorage(PLAYERS_KEY, table);
+  window.dispatchEvent(new CustomEvent('makeup:players-changed'));
+  return { coins: cur.coins, owned: cur.owned };
 }

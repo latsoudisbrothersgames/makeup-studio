@@ -20,6 +20,8 @@ interface Props {
   compositor: Compositor | null;
   ref: Ref<FaceStageHandle>;
   onPointerDownFace?: (e: React.PointerEvent) => void;
+  /** Σκηνικό πίσω από το πρόσωπο (data/shop.ts). */
+  bg?: string;
 }
 
 /** Επιλέγει ακέραιο πολλαπλάσιο των 512 όταν χωράει, αλλιώς ρευστό μέγεθος. */
@@ -28,7 +30,7 @@ function pickSide(avail: number): number {
   return Math.max(160, Math.floor(avail));
 }
 
-export function FaceStage({ face, compositor, ref, onPointerDownFace }: Props) {
+export function FaceStage({ face, compositor, ref, onPointerDownFace, bg = 'classic' }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -96,7 +98,7 @@ export function FaceStage({ face, compositor, ref, onPointerDownFace }: Props) {
 
   return (
     <div className="face-stage" ref={boxRef}>
-      <div className="face-stage__frame">
+      <div className="face-stage__frame" data-bg={bg}>
         <canvas ref={faceRef} width={512} height={512} className="face-stage__face pixelated" onPointerDown={onPointerDownFace} />
         <canvas ref={overlayRef} width={512} height={512} className="face-stage__overlay pixelated" aria-hidden="true" />
       </div>

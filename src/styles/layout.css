@@ -66,7 +66,7 @@
 /* Κατακόρυφες / στενές οθόνες: πρόσωπο επάνω, καλλυντικά κάτω */
 @media (max-width: 900px), (orientation: portrait) {
   .studio {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr) auto;
     grid-template-areas:
       'bar'

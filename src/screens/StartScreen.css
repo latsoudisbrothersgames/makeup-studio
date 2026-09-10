@@ -42,3 +42,5 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+
+.start__row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
