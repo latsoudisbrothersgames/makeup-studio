@@ -23,7 +23,7 @@ for (const [f, items] of Object.entries(combos)) {
   }, items);
   await p.waitForTimeout(300);
   // deco μέσω απευθείας apply δεν υπάρχει στο hook → το κάνουμε με sticker drop στη θέση (resolveDrop → decorate)
-  for (const [, slot] of items.filter((it) => it[3])) {
+  for (const [, slot, , deco] of items.filter((it) => it[3])) {
     const c = await p.evaluate((slot) => window.__studio.regionCenterClient(slot), slot);
     await p.click('text=Έξτρα'); await p.click('[data-category="sticker"]');
     const bb = await (await p.$(`[data-swatch="sticker:${deco}"]`)).boundingBox();
