@@ -61,6 +61,15 @@ export const S = {
   shopEmptyCoins: 'Δεν έχεις νομίσματα ακόμη. Πήγαινε στο Σαλόνι!',
   shopWho: (name: string) => `${name}`,
 
+  catwalk: 'Πασαρέλα!',
+  catwalkTitle: 'Πασαρέλα!',
+  catwalkInAlbum: 'Μπήκε στο άλμπουμ!',
+  catwalkSkip: 'Παράλειψη',
+  catwalkShare: 'Μοιράσου τη φωτογραφία',
+  catwalkDone: 'Τέλος',
+  albumSalon: 'Σαλόνι',
+  albumStudio: 'Στούντιο',
+
   unlocksButton: 'Τι ξεκλειδώνουν τα αστέρια;',
   unlocksHow: 'Κερδίζεις αστέρια στο Παιχνίδι και στο Σαλόνι. Με τα αστέρια ανοίγουν νέα πράγματα:',
   unlocksOpen: 'Ξεκλείδωσε!',

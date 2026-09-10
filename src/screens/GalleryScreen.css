@@ -79,3 +79,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.pcard__badge {
+  display: inline-block;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: #b8860b;
+  background: #fff8dc;
+  border-radius: var(--radius-pill);
+  padding: 1px 10px;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 600px) {
+  .gallery__head .screen__title { font-size: var(--fs-lg); }
+}

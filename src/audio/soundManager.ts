@@ -112,3 +112,20 @@ export function playSound(name: SoundName): void {
       break;
   }
 }
+
+/** Τζινγκλ πασαρέλας (~5″): χαρούμενη μελωδία με τους ίδιους ταλαντωτές — χωρίς αρχεία ήχου. */
+export function playJingle(): void {
+  if (!enabled) return;
+  const c = getContext();
+  if (!c) return;
+  const t0 = c.currentTime + 0.05;
+  // C5 E5 G5 C6 | B5 G5 E5 G5 | A5 C6 A5 G5 | E5 G5 C6 (τελική)
+  const melody = [523.25, 659.25, 783.99, 1046.5, 987.77, 783.99, 659.25, 783.99, 880, 1046.5, 880, 783.99, 659.25, 783.99, 1046.5];
+  const step = 0.3;
+  melody.forEach((f, i) => tone(c, f, t0 + i * step, i === melody.length - 1 ? 0.9 : 0.26, 'triangle', 0.16));
+  // Μπάσο σε κάθε δεύτερο χτύπο
+  const bass = [130.81, 164.81, 196, 130.81, 174.61, 196, 130.81, 130.81];
+  bass.forEach((f, i) => tone(c, f, t0 + i * step * 2, 0.5, 'sine', 0.12));
+  // «Τσικ» στο ρυθμό
+  for (let i = 0; i < melody.length; i += 2) noise(c, t0 + i * step, 0.05, 0.05, 6000);
+}

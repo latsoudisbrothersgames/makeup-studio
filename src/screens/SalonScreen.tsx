@@ -8,6 +8,7 @@ import { ConfirmDialog, Dialog } from '../components/Dialog/Dialog';
 import { DragGhost } from '../components/DragGhost/DragGhost';
 import { FaceStage, type FaceStageHandle } from '../components/FaceStage/FaceStage';
 import { Toast } from '../components/Toast/Toast';
+import { Catwalk } from '../components/Catwalk/Catwalk';
 import { decorateAccessory, isAccessorySlot } from '../data/accessories';
 import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
@@ -23,7 +24,8 @@ import { layerAt } from '../engine/layerAt';
 import { useDragCosmetic, type DragPayload } from '../hooks/useDragCosmetic';
 import { useFaceImages } from '../hooks/useFaceImages';
 import { usePlayerStars } from '../hooks/usePlayerStars';
-import { MAX_NAME_LENGTH, sanitizeName } from '../storage/gallery';
+import { MAX_NAME_LENGTH, newProjectId, sanitizeName, saveProject } from '../storage/gallery';
+import { makeThumbnail } from '../engine/thumbnail';
 import { addCoins, addStars, playerCoins, playerStars } from '../storage/players';
 import { useSession } from '../state/SessionContext';
 import { initialStudioState, newLayerId, studioReducer } from '../state/studioReducer';
@@ -36,7 +38,7 @@ import './SalonScreen.css';
  * «Σαλόνι»: μια πελάτισσα μπαίνει με ένα αίτημα, το παιδί τη φτιάχνει, εκείνη αντιδρά και πληρώνει.
  * Φάσεις: name? → intro → arrive → work → verdict → arrive …
  */
-type Phase = 'name' | 'intro' | 'arrive' | 'work' | 'verdict';
+type Phase = 'name' | 'intro' | 'arrive' | 'work' | 'verdict' | 'catwalk';
 type HintMood = 'idle' | 'good' | 'bad';
 
 const RECENT = 6;
@@ -165,6 +167,23 @@ export function SalonScreen() {
 
   const fix = () => { setPhase('work'); playSound('click'); };
 
+  /** Άλμπουμ: μία εγγραφή ανά πελάτισσα (όνομα, αφορμή, αστέρια), με μικρογραφία. */
+  const savedFor = useRef<string | null>(null);
+  const saveToAlbum = useCallback(() => {
+    if (!customer || !compositor) return;
+    const tag = `${customer.face}:${customer.brief.id}:${served}`;
+    if (savedFor.current === tag) return;
+    savedFor.current = tag;
+    const thumb = makeThumbnail(compositor.render('neutral', layersRef.current));
+    const now = new Date().toISOString();
+    saveProject({
+      v: 1, id: newProjectId(), faceId: customer.face,
+      projectName: `${customer.brief.emoji} ${customer.brief.occasionEl}`,
+      modelName: player, layers: layersRef.current, createdAt: now, updatedAt: now, thumb,
+      kind: 'salon', customer: face.nameEl, occasion: customer.brief.occasionEl, stars: verdict?.stars ?? 0,
+    });
+  }, [customer, compositor, served, player, face.nameEl, verdict]);
+
   // ── Εφαρμογή / σύρσιμο (ίδια λογική με το στούντιο) ──────────────
   const applyLayer = useCallback((layer: AppliedLayer, anchor?: Pt) => {
     dispatch({ type: 'apply', layer });
@@ -232,6 +251,7 @@ export function SalonScreen() {
       finish,
       fix,
       next: () => callNext(),
+      catwalk: () => setPhase('catwalk'),
       apply: (l: Partial<AppliedLayer> & { category: AppliedLayer['category'] }) =>
         applyLayer({ color: '#000', regionIds: [], seed: 1, ...l, id: newLayerId() }),
     };
@@ -327,7 +347,8 @@ export function SalonScreen() {
             <>
               {stars < 3 && <Button variant="ghost" size="lg" onClick={fix} data-action="salon-fix">{S.salonFix}</Button>}
               <Button variant="lilac" size="lg" icon="🛒" onClick={() => nav('/shop')} data-action="salon-shop">{S.shop}</Button>
-              <Button variant="primary" size="lg" onClick={() => callNext()} data-action="salon-next" data-autofocus>{S.salonNext}</Button>
+              <Button variant="ghost" size="lg" onClick={() => callNext()} data-action="salon-next">{S.salonNext}</Button>
+              <Button variant="primary" size="lg" icon="🎉" onClick={() => { setPhase('catwalk'); playSound('pop'); }} data-action="salon-catwalk" data-autofocus>{S.catwalk}</Button>
             </>
           }
         >
@@ -344,6 +365,17 @@ export function SalonScreen() {
           {gained.unlocks.map((u) => <p key={u.stars} className="game__unlock" data-unlock>{u.emoji} {S.gameUnlocked(u.labelEl)}</p>)}
           <p className="salon__served">{S.salonCustomers(served)} · {S.salonCoins(coins)}</p>
         </Dialog>
+      )}
+      {phase === 'catwalk' && customer && (
+        <Catwalk
+          face={face}
+          layers={state.layers}
+          bg={session.stageBg}
+          caption={face.nameEl}
+          subcaption={customer.brief.occasionEl}
+          onFinished={saveToAlbum}
+          onClose={() => { saveToAlbum(); callNext(); }}
+        />
       )}
       {dialog === 'exit' && (
         <ConfirmDialog title={S.salonExitTitle} yesLabel={S.gameExit} onYes={exit} onNo={() => setDialog('none')} />

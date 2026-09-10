@@ -52,6 +52,8 @@ export function GalleryScreen() {
                 </div>
                 <h2 className="pcard__title">{p.projectName}</h2>
                 <p className="pcard__meta">
+                  {p.kind === 'salon' ? <span className="pcard__badge" data-badge="salon">💇 {S.albumSalon}{p.stars ? ` · ${'★'.repeat(p.stars)}` : ''}</span> : null}
+                  {p.kind === 'salon' ? <br /> : null}
                   {face?.nameEl}{p.modelName ? ` · ${p.modelName}` : ''}
                   <br />
                   <span className="pcard__date">{new Date(p.updatedAt).toLocaleDateString('el-GR')}</span>

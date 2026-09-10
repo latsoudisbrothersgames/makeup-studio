@@ -11,6 +11,7 @@ import { PhotoDialog } from '../components/PhotoDialog/PhotoDialog';
 import { renderPhoto, type PhotoBg, type ShareResult } from '../engine/exportImage';
 import { makeCanvas, ctx2d } from '../engine/canvas';
 import { Toast } from '../components/Toast/Toast';
+import { Catwalk } from '../components/Catwalk/Catwalk';
 import { COSMETICS } from '../data/cosmetics';
 import { faceById } from '../data/faces';
 import { S } from '../data/strings';
@@ -78,6 +79,8 @@ export function StudioScreen() {
   const particlesRef = useRef<Particle[]>([]);
   const [hint, setHint] = useState<{ text: string; mood: HintMood }>({ text: S.hintIdle, mood: 'idle' });
   const [dialog, setDialog] = useState<DialogKind>('none');
+  /** Πασαρέλα μετά από κάθε αποθήκευση. */
+  const [catwalk, setCatwalk] = useState<{ caption: string; sub: string } | null>(null);
   const [pendingNav, setPendingNav] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [sel, setSel] = useState<PanelSelection>(() => defaultSelection('lipstick', face ?? faceById('f1')!));
@@ -270,6 +273,7 @@ export function StudioScreen() {
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
       thumb,
+      kind: 'studio',
     };
     const r = saveProject(project);
     if (r === 'full') { setToast(S.galleryFull); return false; }
@@ -279,6 +283,7 @@ export function StudioScreen() {
     dispatch({ type: 'markSaved' });
     playSound('save');
     setToast(r === 'ok-no-thumb' ? S.savedNoThumb : S.saved);
+    setCatwalk({ caption: modelName || face.nameEl, sub: projectName });
     return true;
   }, [face, compositor, session]);
 
@@ -416,6 +421,9 @@ export function StudioScreen() {
           onDone={onPhotoDone}
           onClose={() => setDialog('none')}
         />
+      )}
+      {catwalk && face && (
+        <Catwalk face={face} layers={state.layers} bg={session.stageBg} caption={catwalk.caption} subcaption={catwalk.sub} onClose={() => setCatwalk(null)} />
       )}
       <Toast message={toast} onDone={() => setToast(null)} />
       {/* Κρατά την παλέτα της βάσης ενημερωμένη αν αλλάξει πρόσωπο */}
