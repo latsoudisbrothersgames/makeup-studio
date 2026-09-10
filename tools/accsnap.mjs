@@ -23,7 +23,7 @@ const tests = [['accL', -60, 40], ['accR', 60, 40], ['accTop', 0, -30], ['accL',
 for (const [slot, dx, dy] of tests) {
   const c = await p.evaluate((id) => window.__studio.regionCenterClient(id), slot);
   const tx = c.x + dx * scale, ty = c.y + dy * scale;
-  await swipe(bb.x + bb.width / 2, bb.y + bb.height / 2, tx, ty + 56);
+  await swipe(bb.x + bb.width / 2, bb.y + bb.height / 2, tx, ty);
   await p.waitForTimeout(400);
   const layers = await p.evaluate(() => window.__studio.getLayers().filter(l => l.category === 'accessory').map(l => l.regionIds[0]));
   console.log(`drop ${dx},${dy} from ${slot} →`, layers.at(-1) ?? 'NOTHING', layers.at(-1) === slot ? '✓' : '✗');

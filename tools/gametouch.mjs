@@ -29,7 +29,7 @@ console.log('stages', JSON.stringify(info));
 const you = info.find(i => i.cls.includes('--you')) ?? info[1];
 const sw = await p.$('.panel__swatches .swatch'); const sb = await sw.boundingBox();
 const n0 = await p.evaluate(() => window.__game.layers?.length ?? window.__game.found);
-await swipe(sb.x + sb.width / 2, sb.y + sb.height / 2, you.x + you.w / 2, you.y + you.h * 0.45 + 56, 24);
+await swipe(sb.x + sb.width / 2, sb.y + sb.height / 2, you.x + you.w / 2, you.y + you.h * 0.45, 24);
 await p.waitForTimeout(500);
 const n1 = await p.evaluate(() => window.__game.layers?.length ?? window.__game.found);
 console.log('glitter touch-drag to cheek: layers/found', n0, '→', n1);

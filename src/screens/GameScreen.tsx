@@ -107,7 +107,7 @@ export function GameScreen() {
 
   const stageRef = useRef<FaceStageHandle>(null);
   const targetRef = useRef<FaceStageHandle>(null);
-  const overlayRef = useRef<{ hints: RegionId[]; glow: RegionId[] }>({ hints: [], glow: [] });
+  const overlayRef = useRef<{ hints: RegionId[]; glow: RegionId[]; marker?: Pt }>({ hints: [], glow: [] });
   const particlesRef = useRef<Particle[]>([]);
   const [hint, setHint] = useState<{ text: string; mood: HintMood }>({ text: S.gameHintIdle, mood: 'idle' });
   const [sel, setSel] = useState<PanelSelection>(() => defaultSelection('lipstick', face));
@@ -126,7 +126,7 @@ export function GameScreen() {
   // ── Απόδοση ───────────────────────────────────────────────────────
   const drawOverlayNow = useCallback(() => {
     const o = overlayRef.current;
-    stageRef.current?.overlay(exprRef.current, { hints: debug ? REGION_IDS : o.hints, glow: o.glow, particles: particlesRef.current });
+    stageRef.current?.overlay(exprRef.current, { hints: debug ? REGION_IDS : o.hints, glow: o.glow, marker: o.marker, particles: particlesRef.current });
   }, [debug]);
 
   useEffect(() => {
@@ -300,7 +300,7 @@ export function GameScreen() {
   const drag = useDragCosmetic({
     face, stageRef, exprRef, enabledRef,
     onHover: (p, hints, res) => {
-      overlayRef.current = { hints, glow: res && res.ok ? res.regionIds : [] };
+      overlayRef.current = { hints, glow: res && res.ok ? res.regionIds : [], marker: res && res.ok && res.regionIds.length === 0 ? res.anchor : undefined };
       drawOverlayNow();
       setHint(res && res.ok ? { text: S.hintDropHere, mood: 'good' } : { text: p.cosmetic.hintEl, mood: 'idle' });
     },

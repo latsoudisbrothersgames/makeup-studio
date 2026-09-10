@@ -13,6 +13,9 @@ export interface DragPayload {
 
 export interface DragGhostState extends DragPayload {
   pointerType: string;
+  /** Αρχική θέση (client) — το φάντασμα γεννιέται ήδη εκεί και ορατό. */
+  x: number;
+  y: number;
 }
 
 interface Options {
@@ -25,7 +28,10 @@ interface Options {
   onEnd(): void;
 }
 
-const TOUCH_LIFT = 56;
+/** Σε αφή το φάντασμα σχεδιάζεται λίγο πάνω από το δάχτυλο για να φαίνεται — αλλά το αντικείμενο
+ *  πέφτει ΕΚΕΙ ΠΟΥ ΕΙΝΑΙ ΤΟ ΔΑΧΤΥΛΟ. (Πριν έπεφτε 56px ψηλότερα: σε πρόσωπο 215px = 1/4 του προσώπου —
+ *  το παιδί σημάδευε το πηγούνι και το αυτοκόλλητο πήγαινε στη μύτη.) */
+export const GHOST_LIFT = 60;
 
 /**
  * Σύρσιμο καλλυντικού με Pointer Events (ποντίκι + αφή). Το «φάντασμα» κινείται με ref
@@ -56,7 +62,7 @@ export function useDragCosmetic(opts: Options) {
   const moveGhost = (clientX: number, clientY: number, pointerType: string) => {
     const g = ghostRef.current;
     if (!g) return;
-    const lift = pointerType === 'touch' ? TOUCH_LIFT : 0;
+    const lift = pointerType === 'touch' ? GHOST_LIFT : 0;
     g.style.transform = `translate3d(${clientX}px, ${clientY - lift}px, 0) translate(-50%, -50%)`;
   };
 
@@ -77,8 +83,7 @@ export function useDragCosmetic(opts: Options) {
     let res = a.lastRes;
     const stage = o.stageRef.current;
     if (!cancelled && a.moved && stage && clientX !== undefined && clientY !== undefined) {
-      const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
-      const fp = stage.clientToFace(clientX, clientY - lift);
+      const fp = stage.clientToFace(clientX, clientY);
       a.lastFacePt = fp;
       res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp, a.payload.variant);
     }
@@ -111,17 +116,9 @@ export function useDragCosmetic(opts: Options) {
     a.started = true;
     document.body.classList.add('is-dragging');
     if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
-    setGhost({ ...a.payload, pointerType: a.pointerType });
+    setGhost({ ...a.payload, pointerType: a.pointerType, x: a.startX, y: a.startY });
     const o = optsRef.current;
     o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic, a.payload.variant), null);
-    requestAnimationFrame(() => {
-      const g = ghostRef.current;
-      if (g) {
-        g.style.transition = '';
-        g.style.opacity = '1';
-      }
-      moveGhost(a.startX, a.startY, a.pointerType);
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -142,16 +139,16 @@ export function useDragCosmetic(opts: Options) {
     const o = optsRef.current;
     const stage = o.stageRef.current;
     if (!stage) return;
-    // Το σημείο ελέγχου = το κέντρο του φαντάσματος (σε αφή είναι ανασηκωμένο πάνω από το δάχτυλο).
-    const lift = a.pointerType === 'touch' ? TOUCH_LIFT : 0;
-    const fp = stage.clientToFace(e.clientX, e.clientY - lift);
+    // Το σημείο ελέγχου = το δάχτυλο/δείκτης (όχι το ανασηκωμένο φάντασμα).
+    const fp = stage.clientToFace(e.clientX, e.clientY);
     a.lastFacePt = fp;
     const res = resolveDrop(o.face, o.exprRef.current, a.payload.cosmetic, fp, a.payload.variant);
     // ΠΑΝΤΑ η τελευταία ανάλυση: για ελεύθερη τοποθέτηση (αυτοκόλλητα, γκλίτερ, βαμβάκι) το anchor
     // αλλάζει σε κάθε κίνηση, ενώ οι περιοχές (key) δεν αλλάζουν — αλλιώς «κλειδώνει» στο σημείο εισόδου.
     a.lastRes = res;
     const key = res.ok ? res.regionIds.join('+') || 'free' : 'no';
-    if (key !== a.lastKey) {
+    // Ελεύθερη τοποθέτηση: ενημέρωση σε κάθε κίνηση, ώστε το σημάδι στόχου να ακολουθεί το δάχτυλο.
+    if (key !== a.lastKey || key === 'free') {
       a.lastKey = key;
       o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic, a.payload.variant), res);
     }

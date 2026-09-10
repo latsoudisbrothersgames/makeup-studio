@@ -1,4 +1,4 @@
-import type { Expression, Face, RegionId } from '../types/face';
+import type { Expression, Face, Pt, RegionId } from '../types/face';
 import type { Particle } from './animator';
 import { polyPath, polylinePath } from './geometry';
 import { getRegion } from './regions';
@@ -9,6 +9,8 @@ export interface OverlayState {
   hints: RegionId[];
   /** Περιοχή που «ακούει» τώρα (λαμπερό περίγραμμα). */
   glow: RegionId[];
+  /** Σημάδι στόχου ελεύθερης τοποθέτησης (εκεί θα πέσει το αυτοκόλλητο/γκλίτερ). */
+  marker?: Pt;
   particles: Particle[];
 }
 
@@ -65,6 +67,21 @@ export function drawOverlay(ctx: CanvasRenderingContext2D, face: Face, expr: Exp
       ctx.fillStyle = 'rgba(255,240,150,0.28)';
       ctx.fill(p);
     }
+  }
+  if (s.marker) {
+    const [mx, my] = s.marker;
+    ctx.save();
+    ctx.shadowColor = '#fff2a8';
+    ctx.shadowBlur = 12;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#ffd54f';
+    ctx.beginPath(); ctx.arc(mx, my, 20, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.arc(mx, my, 20, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillRect(mx - 1, my - 7, 3, 15); ctx.fillRect(mx - 7, my - 1, 15, 3);
   }
   for (const pt of s.particles) {
     const a = 1 - pt.life / pt.max;

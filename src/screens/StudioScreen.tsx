@@ -74,7 +74,7 @@ export function StudioScreen() {
   exprRef.current = expr;
 
   const stageRef = useRef<FaceStageHandle>(null);
-  const overlayRef = useRef<{ hints: RegionId[]; glow: RegionId[] }>({ hints: [], glow: [] });
+  const overlayRef = useRef<{ hints: RegionId[]; glow: RegionId[]; marker?: Pt }>({ hints: [], glow: [] });
   const particlesRef = useRef<Particle[]>([]);
   const [hint, setHint] = useState<{ text: string; mood: HintMood }>({ text: S.hintIdle, mood: 'idle' });
   const [dialog, setDialog] = useState<DialogKind>('none');
@@ -129,6 +129,7 @@ export function StudioScreen() {
     st.overlay(exprRef.current, {
       hints: debug ? REGION_IDS : o.hints,
       glow: o.glow,
+      marker: o.marker,
       particles: particlesRef.current,
     });
   }, [debug]);
@@ -208,7 +209,7 @@ export function StudioScreen() {
     exprRef,
     enabledRef,
     onHover: (p, hints, res) => {
-      overlayRef.current = { hints, glow: res && res.ok ? res.regionIds : [] };
+      overlayRef.current = { hints, glow: res && res.ok ? res.regionIds : [], marker: res && res.ok && res.regionIds.length === 0 ? res.anchor : undefined };
       drawOverlayNow();
       if (res === null) setHint({ text: p.cosmetic.hintEl, mood: 'idle' });
       else if (res.ok) setHint({ text: S.hintDropHere, mood: 'good' });

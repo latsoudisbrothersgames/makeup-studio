@@ -34,7 +34,8 @@ export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmeti
   if (t.kind === 'face') return ['faceBox'];
   if (t.kind === 'hair') return ['hair'];
   if (t.kind === 'any') return ['skin', 'hair'];
-  return ['skin'];
+  // Ελεύθερη τοποθέτηση: κανένα περίγραμμα — μόνο το σημάδι στόχου κάτω από το δάχτυλο (overlay.marker).
+  return [];
 }
 
 /** Τι θα ζωγραφιστεί όταν το παιδί αφήσει το καλλυντικό στο σημείο p. */

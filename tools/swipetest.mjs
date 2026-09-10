@@ -31,7 +31,7 @@ await p.click(`.panel__group:has-text("Χείλη")`); await p.waitForTimeout(30
 const sw = await p.$('.panel__swatches .swatch'); const sb = await sw.boundingBox();
 const lips = await p.evaluate(() => window.__studio.regionCenterClient('lips'));
 const n0 = await p.evaluate(() => window.__studio.getLayers().length);
-await swipe(sb.x + sb.width / 2, sb.y + sb.height / 2, lips.x, lips.y + 56, 24);
+await swipe(sb.x + sb.width / 2, sb.y + sb.height / 2, lips.x, lips.y, 24);
 await p.waitForTimeout(600);
 const n1 = await p.evaluate(() => window.__studio.getLayers().length);
 console.log('lipstick drag: layers', n0, '→', n1, n1 > n0 ? 'APPLIED ✓' : 'NOT APPLIED ✗');
