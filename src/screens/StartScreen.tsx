@@ -33,6 +33,7 @@ export function StartScreen() {
       </div>
       <div className="start__actions">
         <Button size="xl" onClick={() => nav('/choose')} data-action="play">{S.play}</Button>
+        <Button size="lg" variant="mint" icon="💇" onClick={() => nav('/salon')} data-action="salon">{S.salon}</Button>
         <Button size="lg" variant="sun" icon="🏆" onClick={() => nav('/choose?mode=game')} data-action="game">{S.game}</Button>
         <Button size="lg" variant="secondary" icon="🖼️" onClick={() => nav('/gallery')}>{S.gallery}</Button>
       </div>

@@ -14,6 +14,10 @@ export interface PlayerStats {
   games: number;
   /** Καλύτερο αποτέλεσμα ανά επίπεδο (αστέρια 0–3). */
   best: Record<string, number>;
+  /** Νομίσματα από το Σαλόνι (για το κατάστημα — βήμα 2). */
+  coins?: number;
+  /** Πελάτισσες που εξυπηρετήθηκαν στο Σαλόνι. */
+  customers?: number;
   updatedAt: string;
 }
 
@@ -35,7 +39,7 @@ export function playerStars(name: string): number {
 }
 
 /** Προσθέτει αστέρια και επιστρέφει το νέο σύνολο του παίκτη. */
-export function addStars(name: string, stars: number, level: number): number {
+export function addStars(name: string, stars: number, level: number | string): number {
   const table = loadPlayers();
   const k = key(name);
   const cur = table[k] ?? { name: name || ANONYMOUS, stars: 0, games: 0, best: {}, updatedAt: '' };
@@ -61,4 +65,23 @@ export function topPlayers(n = 8): PlayerStats[] {
   return Object.values(loadPlayers())
     .sort((a, b) => b.stars - a.stars || b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, n);
+}
+
+export function playerCoins(name: string): number {
+  return loadPlayers()[key(name)]?.coins ?? 0;
+}
+
+/** Νομίσματα από το Σαλόνι· επιστρέφει το νέο σύνολο. Δεν μετρά «παιχνίδι» (τα αστέρια πάνε μέσω addStars). */
+export function addCoins(name: string, coins: number): number {
+  const table = loadPlayers();
+  const k = key(name);
+  const cur = table[k] ?? { name: name || ANONYMOUS, stars: 0, games: 0, best: {}, updatedAt: '' };
+  cur.name = name || ANONYMOUS;
+  cur.coins = (cur.coins ?? 0) + coins;
+  cur.customers = (cur.customers ?? 0) + 1;
+  cur.updatedAt = new Date().toISOString();
+  table[k] = cur;
+  writeStorage(PLAYERS_KEY, table);
+  window.dispatchEvent(new CustomEvent('makeup:players-changed'));
+  return cur.coins;
 }

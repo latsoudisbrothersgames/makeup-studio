@@ -1,0 +1,123 @@
+/* ─── Σαλόνι: ίδιο κέλυφος με το στούντιο (bar / hint / stage / panel) ─── */
+.salon__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.salon__coins {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  color: #b8860b;
+  background: #fff8dc;
+  border: 3px solid #f5d76e;
+  border-radius: var(--radius-pill);
+  padding: 4px 14px;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+}
+
+/* Η γραμμή υποδείξεων είναι κουμπί: πάτημα → ξαναδείχνει το αίτημα */
+.salon__hint {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+
+.salon__hint-who {
+  color: var(--pink-600);
+  margin-right: 4px;
+}
+
+.salon__intro-emoji {
+  text-align: center;
+  font-size: 2.2rem;
+  margin: 0 0 6px;
+}
+
+.salon__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.salon__occasion {
+  font-weight: 700;
+  color: var(--text-600);
+  font-size: var(--fs-md);
+}
+
+.salon__occasion-emoji {
+  font-size: 1.5em;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.salon__request {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--pink-50);
+  border-left: 6px solid var(--pink-500);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--plum-900);
+  line-height: 1.3;
+}
+
+.salon__checklist {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.salon__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  color: var(--plum-900);
+  background: var(--surface-alt);
+}
+
+.salon__check.is-ok { background: #e8fff3; }
+.salon__check.is-missing { background: #fff0f0; }
+
+.salon__check-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1rem;
+  flex: 0 0 auto;
+}
+
+.salon__check.is-ok .salon__check-mark { background: var(--mint-600); }
+.salon__check.is-missing .salon__check-mark { background: var(--coral-600); }
+
+.salon__served {
+  text-align: center;
+  color: var(--text-600);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 900px), (orientation: portrait) {
+  .salon__bar { gap: 6px; flex-wrap: nowrap; }
+  .salon__bar .btn { padding: 0.3em 0.7em; min-height: 40px; font-size: 0.8rem; }
+  .salon__coins { font-size: 0.95rem; padding: 4px 10px; min-height: 40px; }
+  /* Το αίτημα θέλει έως 3 γραμμές σε τηλέφωνο */
+  .salon__hint { height: auto; min-height: 58px; max-height: 78px; }
+  .salon__request { font-size: var(--fs-md); }
+}
