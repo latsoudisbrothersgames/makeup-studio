@@ -12,6 +12,13 @@
 
 .dialog {
   width: min(560px, 100%);
+  /* Ψηλοί διάλογοι (π.χ. «Τι ξεκλειδώνουν τα αστέρια;») κυλούν εσωτερικά — αλλιώς σε τηλέφωνο
+     το κουμπί στο τέλος πέφτει έξω από την οθόνη και δεν πατιέται. */
+  max-height: calc(100dvh - 32px - var(--safe-b));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   background: var(--surface);
   border-radius: var(--radius-lg);
   border: 6px solid var(--pink-200);
@@ -45,7 +52,13 @@
 
 .dialog__actions .btn {
   flex: 1 1 180px;
+  min-width: 0;
+  /* Μακριές ετικέτες («Επόμενη πελάτισσα») τυλίγονται αντί να βγαίνουν έξω από το κουμπί */
+  white-space: normal;
+  text-align: center;
+  line-height: 1.15;
 }
+.dialog__actions .btn__label { white-space: normal; }
 
 .field {
   display: flex;

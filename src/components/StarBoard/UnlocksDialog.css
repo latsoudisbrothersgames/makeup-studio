@@ -1,0 +1,67 @@
+.unlocks__how {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-600);
+  margin-bottom: 10px;
+}
+
+.unlocks {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.unlock {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  border: 3px solid var(--pink-100);
+}
+
+.unlock.is-open { background: #fff8dc; border-color: #f5d76e; }
+.unlock.is-locked .unlock__art { filter: grayscale(0.8) brightness(0.92); opacity: 0.75; }
+
+.unlock__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 76px;
+  height: 56px;
+}
+
+.unlock__img { width: 44px; height: 44px; object-fit: contain; }
+.unlock__img--rainbow {
+  border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(#ff5c5c, #ffd54f, #6fe07f, #4fc3f7, #b388ff, #ff5c5c);
+}
+.unlock__swatch { width: 30px; height: 30px; border-radius: 50%; border: 3px solid #fff; box-shadow: var(--shadow-sm); }
+
+.unlock__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
+.unlock__label { font-weight: 800; color: var(--plum-900); }
+.unlock__status { font-size: var(--fs-sm); font-weight: 700; color: var(--text-600); }
+.unlock.is-open .unlock__status { color: var(--mint-600); }
+.unlock__stars { font-weight: 800; color: #d99a00; white-space: nowrap; }
+
+.unlocks__me { display: flex; flex-direction: column; gap: 6px; align-items: stretch; margin-bottom: 8px; }
+.unlocks__you { font-weight: 800; color: var(--plum-900); text-align: center; }
+.unlocks__bar { height: 14px; border-radius: 999px; background: var(--lilac-100); overflow: hidden; }
+.unlocks__fill { display: block; height: 100%; background: linear-gradient(90deg, #ffd54f, #ff9f43); border-radius: 999px; }
+.unlocks__next { font-size: var(--fs-sm); font-weight: 700; color: var(--text-600); text-align: center; }
+.unlocks__coins { font-size: var(--fs-sm); color: var(--text-600); text-align: center; }
+
+@media (max-width: 600px) {
+  .unlocks__how { font-size: var(--fs-sm); margin-bottom: 6px; }
+  .unlocks { gap: 6px; margin-bottom: 8px; }
+  .unlock { grid-template-columns: 60px 1fr auto; gap: 8px; padding: 5px 8px; }
+  .unlock__art { width: 60px; height: 48px; }
+  .unlock__img { width: 36px; height: 36px; }
+}

@@ -299,7 +299,7 @@ export function SalonScreen() {
           actions={
             <>
               <Button variant="ghost" size="lg" onClick={exit}>{S.back}</Button>
-              <Button variant="primary" size="xl" onClick={() => callNext()} data-action="salon-open" data-autofocus>{S.salonOpen}</Button>
+              <Button variant="primary" size="lg" onClick={() => callNext()} data-action="salon-open" data-autofocus>{S.salonOpen}</Button>
             </>
           }
         >

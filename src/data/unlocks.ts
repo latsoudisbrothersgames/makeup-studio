@@ -9,13 +9,15 @@ export interface Unlock {
   labelEl: string;
   emoji: string;
   keys: string[];
+  /** Εικαστικό για το μενού «Τι ξεκλειδώνουν τα αστέρια;» (sprites/χρώματα που υπάρχουν ήδη). */
+  art: { kind: 'accessory' | 'sticker' | 'swatch' | 'icon'; ids: string[] };
 }
 
 export const UNLOCKS: Unlock[] = [
-  { stars: 3, labelEl: 'Τιάρα', emoji: '👑', keys: ['accessory:tiara'] },
-  { stars: 6, labelEl: 'Μωβ και τιρκουάζ μαλλιά', emoji: '💜', keys: ['hairColor:#9a5ed8', 'hairColor:#3fd0c9', 'hairStreak:#9a5ed8', 'hairStreak:#3fd0c9'] },
-  { stars: 10, labelEl: 'Πεταλούδα και πετράδι', emoji: '🦋', keys: ['sticker:butterfly', 'sticker:gem'] },
-  { stars: 15, labelEl: 'Μπογιά ουράνιο τόξο', emoji: '🌈', keys: ['facePaint:rainbow'] },
+  { stars: 3, labelEl: 'Τιάρα', emoji: '👑', keys: ['accessory:tiara'], art: { kind: 'accessory', ids: ['tiara'] } },
+  { stars: 6, labelEl: 'Μωβ και τιρκουάζ μαλλιά', emoji: '💜', keys: ['hairColor:#9a5ed8', 'hairColor:#3fd0c9', 'hairStreak:#9a5ed8', 'hairStreak:#3fd0c9'], art: { kind: 'swatch', ids: ['#9a5ed8', '#3fd0c9'] } },
+  { stars: 10, labelEl: 'Πεταλούδα και πετράδι', emoji: '🦋', keys: ['sticker:butterfly', 'sticker:gem'], art: { kind: 'sticker', ids: ['butterfly', 'gem'] } },
+  { stars: 15, labelEl: 'Μπογιά ουράνιο τόξο', emoji: '🌈', keys: ['facePaint:rainbow'], art: { kind: 'icon', ids: ['facePaint'] } },
 ];
 
 /** Κλειδί για swatch (χρώμα) ή παραλλαγή. */

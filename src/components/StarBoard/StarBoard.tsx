@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { S } from '../../data/strings';
 import { nextUnlock, UNLOCKS } from '../../data/unlocks';
 import { ANONYMOUS, playerStars, topPlayers, type PlayerStats } from '../../storage/players';
+import { Button } from '../Button/Button';
+import { UnlocksDialog } from './UnlocksDialog';
 import './StarBoard.css';
 
 interface Props {
@@ -14,6 +16,7 @@ interface Props {
 export function StarBoard({ current, max = 8 }: Props) {
   const [rows, setRows] = useState<PlayerStats[]>(() => topPlayers(max));
   const [mine, setMine] = useState(() => playerStars(current));
+  const [showUnlocks, setShowUnlocks] = useState(false);
   useEffect(() => {
     const refresh = () => { setRows(topPlayers(max)); setMine(playerStars(current)); };
     refresh();
@@ -51,6 +54,8 @@ export function StarBoard({ current, max = 8 }: Props) {
           </li>
         ))}
       </ul>
+      <Button variant="sun" icon="⭐" onClick={() => setShowUnlocks(true)} data-action="unlocks">{S.unlocksButton}</Button>
+      {showUnlocks && <UnlocksDialog name={current} stars={mine} onClose={() => setShowUnlocks(false)} />}
     </section>
   );
 }
