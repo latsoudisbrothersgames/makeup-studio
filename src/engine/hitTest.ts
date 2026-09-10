@@ -76,8 +76,10 @@ export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p:
     return { ok: true, regionIds: ['skin'], anchor: [ax, ay] };
   }
   if (t.kind === 'any') {
-    if (!hitsRegion(face, expr, 'skin', p, 30) && !hairHit(face.id, p, 22)) return { ok: false };
-    return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };
+    if (hairHit(face.id, p, 22)) return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };
+    const skinAny = getRegion(face.regions, expr, 'skin').points;
+    if (!nearPolygon(p, skinAny, FREE_TOLERANCE)) return { ok: false };
+    return { ok: true, regionIds: [], anchor: clampIntoPolygon(p, skinAny) };
   }
   if (t.kind === 'hair') {
     if (!hairHit(face.id, p, 22)) return { ok: false };
@@ -89,8 +91,34 @@ export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p:
       if (hitsRegion(face, expr, id, p, 8)) return { ok: true, regionIds: [id], anchor: centroid(getRegion(face.regions, expr, id).points) };
     }
   }
-  if (!pointInPolygon(p, getRegion(face.regions, expr, 'skin').points)) return { ok: false };
-  return { ok: true, regionIds: [], anchor: [Math.round(p[0]), Math.round(p[1])] };
+  // Ελεύθερη τοποθέτηση (γκλίτερ, αυτοκόλλητα, ελιά): με ανοχή — λίγο έξω από το πρόσωπο κουμπώνει μέσα.
+  // Σε κινητό (μικρό πρόσωπο, φάντασμα ανασηκωμένο) η ακριβής ρίψη μέσα στο δέρμα ήταν δύσκολη.
+  const skin = getRegion(face.regions, expr, 'skin').points;
+  if (!nearPolygon(p, skin, FREE_TOLERANCE)) return { ok: false };
+  return { ok: true, regionIds: [], anchor: clampIntoPolygon(p, skin) };
+}
+
+/** Ανοχή (μονάδες προσώπου) για ελεύθερη τοποθέτηση: λίγο έξω από το δέρμα → κουμπώνει στο πλησιέστερο σημείο μέσα. */
+const FREE_TOLERANCE = 34;
+
+/** Μέσα στο πολύγωνο ή έως `tol` μονάδες από το περίγραμμά του (πραγματική απόσταση, όχι έλλειψη). */
+function nearPolygon(p: Pt, poly: Pt[], tol: number): boolean {
+  if (pointInPolygon(p, poly)) return true;
+  return distToPolyline(p, [...poly, poly[0]]) <= tol;
+}
+
+/** Αν το p είναι έξω από το πολύγωνο, το φέρνει μέσα κατά μήκος της ευθείας προς το κέντρο (δυαδική αναζήτηση). */
+function clampIntoPolygon(p: Pt, poly: Pt[]): Pt {
+  if (pointInPolygon(p, poly)) return p;
+  const c = centroid(poly);
+  let lo = 0, hi = 1; // 0 = p (έξω), 1 = c (μέσα)
+  for (let i = 0; i < 14; i++) {
+    const m = (lo + hi) / 2;
+    const q: Pt = [p[0] + (c[0] - p[0]) * m, p[1] + (c[1] - p[1]) * m];
+    if (pointInPolygon(q, poly)) hi = m; else lo = m;
+  }
+  const t = Math.min(1, hi + 0.04); // λίγο πιο μέσα από το όριο
+  return [Math.round(p[0] + (c[0] - p[0]) * t), Math.round(p[1] + (c[1] - p[1]) * t)];
 }
 
 function remapToLash(cosmetic: Cosmetic, id: RegionId): RegionId {

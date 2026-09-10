@@ -356,7 +356,7 @@ export function GameScreen() {
       </div>
       <div className={`hintbar game__hint hintbar--${hint.mood}`} aria-live="polite">{hint.text}</div>
       <div className="game__stages">
-        <div className="game__stage">
+        <div className="game__stage game__stage--target">
           <div className="game__label">{mode === 'duo' && phase === 'create' ? S.gameCreating(creator) : S.gameTarget}</div>
           <FaceStage face={face} compositor={targetCompositor} ref={targetRef} />
         </div>

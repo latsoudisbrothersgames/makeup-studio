@@ -124,7 +124,10 @@
   .game__bar .btn { padding: 0.3em 0.7em; min-height: 40px; font-size: 0.8rem; }
   .game__timer, .game__score { font-size: 0.95rem; padding: 4px 10px; }
   .game__timer { min-width: 5.5em; }
-  .game__stages { gap: 8px; height: min(50vw, 40dvh); }
+  /* Το πρόσωπο του παιδιού («Εσύ») μεγαλύτερο από το πρότυπο: σε 390px οθόνη ~215px αντί 165px —
+     πιο εύκολη στόχευση με το δάχτυλο. Το πρότυπο μένει αναφορά. */
+  .game__stages { gap: 8px; grid-template-columns: 2fr 3fr; height: min(62vw, 44dvh); }
+  .game__stage--target { align-self: end; }
   .game__label { font-size: 0.85rem; padding-bottom: 2px; }
   .game__panel { max-height: none; }
   .game__levels { grid-template-columns: 1fr; }
