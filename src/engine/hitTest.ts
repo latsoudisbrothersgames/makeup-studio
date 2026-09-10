@@ -5,6 +5,9 @@ import { getRegion } from './regions';
 import { hairCentroid, hairHit } from './hairMask';
 import { ACCESSORY_SLOTS, slotsFor } from '../data/accessories';
 
+/** Μέγιστη απόσταση (σε μονάδες προσώπου 512) από το κέντρο θέσης αξεσουάρ για να «κουμπώσει». */
+const ACCESSORY_SNAP_RADIUS = 120;
+
 export type DropResolution =
   | { ok: true; regionIds: RegionId[]; anchor: Pt }
   | { ok: false };
@@ -37,8 +40,24 @@ export function candidateRegions(face: Face, expr: Expression, cosmetic: Cosmeti
 /** Τι θα ζωγραφιστεί όταν το παιδί αφήσει το καλλυντικό στο σημείο p. */
 export function resolveDrop(face: Face, expr: Expression, cosmetic: Cosmetic, p: Pt, variant?: string): DropResolution {
   const t = cosmetic.target;
+  // Αξεσουάρ: κουμπώνει στην ΠΛΗΣΙΕΣΤΕΡΗ επιτρεπτή θέση αν αφεθεί οπουδήποτε κοντά στο κεφάλι
+  // (πάνω στα μαλλιά ή έως ~120 μονάδες από μια θέση). Οι θέσεις είναι μικροί κύκλοι· σε κινητό,
+  // κάτω από το δάχτυλο, ήταν πολύ δύσκολο να πετύχεις τους πλαϊνούς.
+  if (cosmetic.category === 'accessory') {
+    const slots = slotsFor(variant).filter((id) => getRegion(face.regions, expr, id).points.length >= 3);
+    let best: { id: RegionId; d: number; c: Pt } | null = null;
+    for (const id of slots) {
+      const c = centroid(getRegion(face.regions, expr, id).points);
+      const d = Math.hypot(p[0] - c[0], p[1] - c[1]);
+      if (!best || d < best.d) best = { id, d, c };
+    }
+    if (!best) return { ok: false };
+    const nearHead = best.d <= ACCESSORY_SNAP_RADIUS || hairHit(face.id, p, 24);
+    if (!nearHead) return { ok: false };
+    return { ok: true, regionIds: [best.id], anchor: best.c };
+  }
   if (t.kind === 'regions') {
-    const regions = cosmetic.category === 'accessory' ? slotsFor(variant) : t.regions;
+    const regions = t.regions;
     for (const id of regions) {
       if (!hitsRegion(face, expr, id, p, 24)) continue;
       const ids: RegionId[] = [id];
