@@ -80,6 +80,12 @@
   .studio__panel {
     max-height: 42dvh;
   }
+}
+/* Τηλέφωνα: λίγο περισσότερος χώρος στο panel, το πρόσωπο παίρνει ό,τι μένει */
+@media (max-width: 600px) and (orientation: portrait) {
+  .studio__panel {
+    max-height: 46dvh;
+  }
   .hintbar {
     font-size: var(--fs-sm);
     padding: 4px 12px;

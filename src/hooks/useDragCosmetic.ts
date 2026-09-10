@@ -46,6 +46,9 @@ export function useDragCosmetic(opts: Options) {
     lastRes: DropResolution | null;
     lastFacePt: Pt;
     moved: boolean;
+    /** Σε αφή το σύρσιμο «ανοίγει» μόνο αν η πρώτη κίνηση είναι κατακόρυφη (προς το πρόσωπο)·
+     *  οριζόντια κίνηση = κύλιση της λωρίδας, την αφήνουμε στον browser. */
+    started: boolean;
     startX: number;
     startY: number;
   } | null>(null);
@@ -103,11 +106,37 @@ export function useDragCosmetic(opts: Options) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Πραγματική έναρξη σύρσιματος: φάντασμα, δείκτης, υπόδειξη περιοχών. */
+  const begin = useCallback((a: NonNullable<typeof active.current>) => {
+    a.started = true;
+    document.body.classList.add('is-dragging');
+    if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
+    setGhost({ ...a.payload, pointerType: a.pointerType });
+    const o = optsRef.current;
+    o.onHover(a.payload, candidateRegions(o.face, o.exprRef.current, a.payload.cosmetic, a.payload.variant), null);
+    requestAnimationFrame(() => {
+      const g = ghostRef.current;
+      if (g) {
+        g.style.transition = '';
+        g.style.opacity = '1';
+      }
+      moveGhost(a.startX, a.startY, a.pointerType);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onMove = useCallback((e: PointerEvent) => {
     const a = active.current;
     if (!a || e.pointerId !== a.pointerId) return;
+    const dx = e.clientX - a.startX;
+    const dy = e.clientY - a.startY;
+    if (!a.started) {
+      if (Math.hypot(dx, dy) < (a.pointerType === 'touch' ? 8 : 4)) return;
+      // Αφή: οριζόντια κίνηση → κύλιση της λωρίδας (touch-action: pan-x), όχι σύρσιμο.
+      if (a.pointerType === 'touch' && Math.abs(dx) > Math.abs(dy) * 1.2) { finish(true); return; }
+      begin(a);
+    }
     e.preventDefault();
-    if (!a.moved && Math.hypot(e.clientX - a.startX, e.clientY - a.startY) < 4) return;
     a.moved = true;
     moveGhost(e.clientX, e.clientY, a.pointerType);
     const o = optsRef.current;
@@ -162,29 +191,19 @@ export function useDragCosmetic(opts: Options) {
     const el = e.currentTarget as HTMLElement;
     e.preventDefault();
     try { el.setPointerCapture(e.pointerId); } catch { /* παλιοί browsers */ }
-    active.current = {
+    const a = {
       payload, el, pointerId: e.pointerId, pointerType: e.pointerType,
-      lastKey: '', lastRes: null, lastFacePt: [0, 0], moved: false, startX: e.clientX, startY: e.clientY,
+      lastKey: '', lastRes: null, lastFacePt: [0, 0] as Pt, moved: false, started: false, startX: e.clientX, startY: e.clientY,
     };
+    active.current = a;
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onCancel);
     el.addEventListener('lostpointercapture', onLost);
     window.addEventListener('pointerup', onWindowUp, true);
-    document.body.classList.add('is-dragging');
-    if (ghostTimer.current) { window.clearTimeout(ghostTimer.current); ghostTimer.current = null; }
-    setGhost({ ...payload, pointerType: e.pointerType });
-    const o = optsRef.current;
-    o.onHover(payload, candidateRegions(o.face, o.exprRef.current, payload.cosmetic, payload.variant), null);
-    requestAnimationFrame(() => {
-      const g = ghostRef.current;
-      if (g) {
-        g.style.transition = '';
-        g.style.opacity = '1';
-      }
-      moveGhost(e.clientX, e.clientY, e.pointerType);
-    });
-  }, [onMove, onUp, onCancel, onLost, onWindowUp]);
+    // Ποντίκι: το φάντασμα εμφανίζεται αμέσως. Αφή: μόνο όταν η πρώτη κίνηση δείξει σύρσιμο (onMove).
+    if (e.pointerType !== 'touch') begin(a);
+  }, [onMove, onUp, onCancel, onLost, onWindowUp, begin]);
 
   // Escape / απώλεια εστίασης παραθύρου → ακύρωση
   useEffect(() => {

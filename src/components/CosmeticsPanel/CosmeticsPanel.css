@@ -177,7 +177,16 @@
   .panel {
     padding: 8px;
     gap: 6px;
-    overflow: hidden;
+    /* Αν δεν χωρά, κυλά κατακόρυφα (δίχτυ ασφαλείας)· τα πλακίδια επιτρέπουν μόνο οριζόντια
+       κύλιση (pan-x) — κατακόρυφη κίνηση πάνω τους = σύρσιμο προς το πρόσωπο. */
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel__cat,
+  .swatch {
+    touch-action: pan-x;
   }
   .panel__group {
     min-height: 48px;
@@ -278,4 +287,16 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Κινητά: πιο συμπαγές panel ώστε να χωρούν ομάδες + εργαλεία + παραλλαγές + χρώματα χωρίς κόψιμο·
+   η υπόδειξη της κατηγορίας εμφανίζεται ούτως ή άλλως στη γραμμή υποδείξεων όταν ξεκινά το σύρσιμο. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .panel__group { min-height: 44px; }
+  .panel__cat { flex-basis: 88px; min-height: 64px; }
+  .panel__cat-img { width: 34px; height: 34px; }
+  .panel__hint { display: none; }
+  .panel__swatches, .panel__variants { padding: 3px 2px 4px; }
+  .swatch { flex-basis: 52px; width: 52px; min-height: 52px; border-width: 3px; }
+  .swatch--variant img { width: 38px; height: 38px; }
 }
